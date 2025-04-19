@@ -1,1 +1,44 @@
 build/*
+backendnode/dist/*
+
+# Backendnode
+
+backendnode/node_modules
+backendnode/logs
+backendnode/*.log
+backendnode/npm-debug.log*
+backendnode/yarn-debug.log*
+backendnode/yarn-error.log*
+backendnode/pnpm-debug.log*
+backendnode/lerna-debug.log*
+
+# Environment variables
+backendnode/.env
+backendnode/.env.*
+!.env.example
+
+# OS generated files
+backendnode/.DS_Store
+backendnode/Thumbs.db
+
+# IDE files
+backendnode/.vscode/
+backendnode/.idea/
+
+# Test reports
+backendnode/coverage/
+backendnode/*.lcov
+
+# Optional files
+backendnode/.npm
+backendnode/.eslintcache
+
+# Optional files
+
+# backendnode/tsconfig.json
+# backendnode/tsconfig.build.json
+# backendnode/tsconfig.dev.json
+# backendnode/tsconfig.test.json
+
+package-lock.json
+move.lock
