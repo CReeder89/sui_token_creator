@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import TokenForm from "./components/TokenForm.jsx";
 import TokenList from "./components/TokenList.jsx";
+import { WalletConnect } from "./components/WalletConnect.jsx";
 
 function App() {
   const [snackbar, setSnackbar] = useState({
@@ -30,36 +31,42 @@ function App() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h3" align="center" gutterBottom>
-        Sui Custom Token Generator
-      </Typography>
-      <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-        <TokenForm
-          onSuccess={() => setRefreshTokens((r) => !r)}
-          onSnackbar={handleSnackbar}
-          deployerAddress={deployerAddress}
-          setDeployerAddress={setDeployerAddress}
-        />
-      </Paper>
-      <Box mt={4}>
-        <TokenList
-          refresh={refreshTokens}
-          deployerAddress={deployerAddress}
-          onSnackbar={handleSnackbar}
-        />
-      </Box>
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Container>
+    <div>
+      <header>
+        <h1>Sui Token Generator</h1>
+        <WalletConnect />
+      </header>
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Typography variant="h3" align="center" gutterBottom>
+          Sui Custom Token Generator
+        </Typography>
+        <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+          <TokenForm
+            onSuccess={() => setRefreshTokens((r) => !r)}
+            onSnackbar={handleSnackbar}
+            deployerAddress={deployerAddress}
+            setDeployerAddress={setDeployerAddress}
+          />
+        </Paper>
+        <Box mt={4}>
+          <TokenList
+            refresh={refreshTokens}
+            deployerAddress={deployerAddress}
+            onSnackbar={handleSnackbar}
+          />
+        </Box>
+        <Snackbar
+          open={snackbar.open}
+          autoHideDuration={4000}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        >
+          <Alert severity={snackbar.severity} sx={{ width: "100%" }}>
+            {snackbar.message}
+          </Alert>
+        </Snackbar>
+      </Container>
+    </div>
   );
 }
 

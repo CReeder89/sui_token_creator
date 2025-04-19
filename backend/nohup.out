@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/Users/kunalgola/Projects/Sui/move_sui_fungable_token/backend/scripts/event_listener.py", line 4, in <module>
+    from sui import SuiClient
+ModuleNotFoundError: No module named 'sui'

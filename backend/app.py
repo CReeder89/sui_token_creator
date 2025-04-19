@@ -6,7 +6,8 @@ from fastapi.responses import FileResponse, JSONResponse
 from pydantic import BaseModel
 from typing import Optional, List
 from scripts.deploy_contract import deploy_move_contract
-from scripts.sui_utils import get_user_tokens
+from scripts.sui_utils import get_user_tokens, mint_token, burn_token, transfer_token
+from scripts.move_package_utils import create_move_package
 from database import add_token_record, get_tokens_by_deployer
 
 app = FastAPI()
@@ -28,14 +29,41 @@ class ContractParams(BaseModel):
     burn: bool = True
     transfer: bool = True
     module_name: Optional[str] = None  # If not provided, will be auto-generated
+    move_code: Optional[str] = None  # For direct code submission
 
 class DeployParams(BaseModel):
-    contract_path: str
+    move_code: str  # The code to deploy
+    module_name: str
     deployer_address: str
-    private_key: str  # In production, use secure key management!
+    private_key: str
+    # Optionally, add more fields for richer metadata
 
 class UserTokensRequest(BaseModel):
     address: str
+
+class MintParams(BaseModel):
+    package_id: str
+    module_name: str
+    treasury_cap_id: str
+    amount: int
+    recipient: str
+    sender_address: str
+    # Optionally, add gas_budget, etc.
+
+class BurnParams(BaseModel):
+    package_id: str
+    module_name: str
+    treasury_cap_id: str
+    amount: int
+    sender_address: str
+
+class TransferParams(BaseModel):
+    package_id: str
+    module_name: str
+    coin_object_id: str
+    amount: int
+    recipient: str
+    sender_address: str
 
 @app.post("/generate_contract")
 def generate_contract(params: ContractParams):
@@ -96,17 +124,18 @@ def generate_contract(params: ContractParams):
 @app.post("/deploy_contract")
 def deploy_contract(params: DeployParams):
     try:
-        tx_hash, package_id = deploy_move_contract(params.contract_path, params.deployer_address, params.private_key)
-        # Load contract metadata for record
-        with open(params.contract_path, 'r') as f:
-            contract_code = f.read()
-        # Extract metadata from code filename and params
+        tx_hash, package_id = deploy_move_contract(
+            params.move_code,
+            params.module_name,
+            params.deployer_address,
+            params.private_key
+        )
         record = {
-            "module_name": os.path.splitext(os.path.basename(params.contract_path))[0],
+            "module_name": params.module_name,
             "deployer_address": params.deployer_address,
             "tx_hash": tx_hash,
             "package_id": package_id,
-            "contract_path": params.contract_path,
+            "move_code": params.move_code,
             "name": getattr(params, 'name', None),
             "symbol": getattr(params, 'symbol', None),
             "decimals": getattr(params, 'decimals', None),
@@ -117,6 +146,30 @@ def deploy_contract(params: DeployParams):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.post("/mint")
+def mint(params: MintParams):
+    try:
+        tx_hash = mint_token(params)
+        return {"status": "success", "tx_hash": tx_hash}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/burn")
+def burn(params: BurnParams):
+    try:
+        tx_hash = burn_token(params)
+        return {"status": "success", "tx_hash": tx_hash}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/transfer")
+def transfer(params: TransferParams):
+    try:
+        tx_hash = transfer_token(params)
+        return {"status": "success", "tx_hash": tx_hash}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.post("/my_tokens")
 def my_tokens(req: UserTokensRequest):
     try:
@@ -124,3 +177,12 @@ def my_tokens(req: UserTokensRequest):
         return {"tokens": tokens}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/user_tokens")
+def api_user_tokens(address: str):
+    """
+    Returns a list of token objects deployed/owned by the address.
+    """
+    tokens = get_user_tokens(address)
+    # For demo, just return the coins. In production, enrich with metadata.
+    return {"tokens": tokens}

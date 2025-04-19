@@ -1,9 +1,17 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import App from './App.jsx';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App.jsx";
+import { DappKitProvider } from "./dappKitProvider.jsx";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const queryClient = new QueryClient();
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <QueryClientProvider client={queryClient}>
+      <DappKitProvider>
+        <App />
+      </DappKitProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
