@@ -48,17 +48,16 @@ def generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri
     move_code = f"""
 module {module_name}::token {{
     use sui::coin;
-    use sui::tx_context::TxContext;
+    use sui::tx_context::sender;
     use sui::transfer;
-    use sui::object;
 
-    struct {symbol} has store, copy, drop {{}}
+    public struct {symbol} has store, copy, drop {{}}
 
     public fun mint(
         treasury_cap: &mut coin::TreasuryCap<{symbol}>,
         amount: u64,
         recipient: address,
-        ctx: &mut TxContext
+        ctx: &mut sui::tx_context::TxContext
     ) {{
         let coin = coin::mint<{symbol}>(treasury_cap, amount, ctx);
         transfer::public_transfer(coin, recipient);
@@ -67,22 +66,24 @@ module {module_name}::token {{
     public fun burn(
         treasury_cap: &mut coin::TreasuryCap<{symbol}>,
         amount: u64,
-        ctx: &mut TxContext
+        ctx: &mut sui::tx_context::TxContext
     ) {{
-        let coin = coin::withdraw<{symbol}>(treasury_cap, amount, ctx);
-        coin::burn(coin);
+        let coin = coin::mint<{symbol}>(treasury_cap, amount, ctx);
+        coin::burn(treasury_cap, coin);
     }}
 
     public fun transfer(
-        coin: coin::Coin<{symbol}>,
+        mut coin: coin::Coin<{symbol}>,
         recipient: address,
         amount: u64,
-        ctx: &mut TxContext
+        ctx: &mut sui::tx_context::TxContext
     ) {{
-        let (send, remain) = coin::split(coin, amount, ctx);
+        let send = coin::split(&mut coin, amount, ctx);
         transfer::public_transfer(send, recipient);
-        if (coin::value(&remain) > 0) {{
-            transfer::public_transfer(remain, tx_context::sender(ctx));
+        if (coin::value(&coin) > 0) {{
+            transfer::public_transfer(coin, sender(ctx));
+        }} else {{
+            coin::destroy_zero(coin);
         }}
     }}
 }}
@@ -100,18 +101,31 @@ def deploy_token_contract(contract_dir, creator_address):
     try:
         # Build the Move package
         build_cmd = ["sui", "move", "build", "--path", contract_dir]
-        subprocess.run(build_cmd, check=True)
+        build_result = subprocess.run(build_cmd, capture_output=True, text=True)
+        print(f"[DeployContract] Build stdout:\n{build_result.stdout}")
+        print(f"[DeployContract] Build stderr:\n{build_result.stderr}")
+        if build_result.returncode != 0:
+            return {'success': False, 'error': f"Build failed: {build_result.stderr}"}
         # Publish the package
         publish_cmd = [
-            "sui", "client", "publish", "--gas-budget", "100000000", "--json", "--path", contract_dir, "--sender", creator_address
+            "sui", "client", "publish", contract_dir, "--gas-budget", "100000000", "--json"
         ]
-        result = subprocess.run(publish_cmd, capture_output=True, check=True)
-        output = result.stdout.decode()
+        publish_result = subprocess.run(publish_cmd, capture_output=True, text=True)
+        print(f"[DeployContract] Publish stdout:\n{publish_result.stdout}")
+        print(f"[DeployContract] Publish stderr:\n{publish_result.stderr}")
+        if publish_result.returncode != 0:
+            return {'success': False, 'error': f"Publish failed: {publish_result.stderr}"}
+        output = publish_result.stdout
         import json
         resp = json.loads(output)
-        package_id = resp.get('packageId')
+        package_id = None
+        for obj in resp.get('objectChanges', []):
+            if obj.get('type') == 'published':
+                package_id = obj.get('packageId')
+                break
         return {'success': True, 'package_id': package_id}
     except Exception as e:
+        print(f"[DeployContract] Exception: {e}")
         return {'success': False, 'error': str(e)}
     finally:
         cleanup_package(contract_dir)
