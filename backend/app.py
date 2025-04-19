@@ -9,8 +9,14 @@ from scripts.deploy_contract import deploy_move_contract
 from scripts.sui_utils import get_user_tokens, mint_token, burn_token, transfer_token
 from scripts.move_package_utils import create_move_package
 from database import add_token_record, get_tokens_by_deployer
+from scripts.event_listener import start_event_listener
 
 app = FastAPI()
+
+@app.on_event("startup")
+def on_startup():
+    print("[App] FastAPI startup event triggered. Starting event listener...")
+    start_event_listener()
 
 # Directory paths
 TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), 'templates', 'fungible_token_template.move')
