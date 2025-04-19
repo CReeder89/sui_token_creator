@@ -8,11 +8,10 @@ import {
 } from "@mui/material";
 import { Transaction } from "@mysten/sui/transactions";
 import { useCurrentAccount, useSignTransaction, useSuiClient } from "@mysten/dapp-kit";
-import { bcs } from "@mysten/sui/bcs";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
 const FACTORY_PACKAGE_ID =
-  "0x18dfdc7b1568eb9d6eac2057327ee2763e25473c4523bc635743b9b01707a46e";
+  "0xb7695b31d40c1c1023fb427bc08a8d62dda2087e387136cb05bc7a7eea0dfcf6";
 const FACTORY_MODULE = "factory";
 const FACTORY_FUNCTION = "create_token";
 
@@ -77,7 +76,6 @@ export default function TokenForm({ onSnackbar }) {
       const decimalsNum = Number(form.decimals);
       const initialSupplyBig = BigInt(form.initialSupply);
       const metadataBytes = new TextEncoder().encode(form.metadataUri);
-      const feePaid = BigInt(0);
 
       const tx = new Transaction();
       tx.moveCall({
@@ -88,7 +86,6 @@ export default function TokenForm({ onSnackbar }) {
           tx.pure("u8", decimalsNum),
           tx.pure("u64", initialSupplyBig),
           tx.pure("vector<u8>", metadataBytes),
-          tx.pure("u64", feePaid),
         ],
       });
       // 1. Sign the transaction using the dApp Kit hook
