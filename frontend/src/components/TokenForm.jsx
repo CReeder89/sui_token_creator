@@ -5,13 +5,14 @@ import {
   TextField,
   Button,
   CircularProgress,
+  Card,
 } from "@mui/material";
 import { Transaction } from "@mysten/sui/transactions";
 import { useCurrentAccount, useSignTransaction, useSuiClient } from "@mysten/dapp-kit";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
 const FACTORY_PACKAGE_ID =
-  "0xb7695b31d40c1c1023fb427bc08a8d62dda2087e387136cb05bc7a7eea0dfcf6";
+  "0x18dfdc7b1568eb9d6eac2057327ee2763e25473c4523bc635743b9b01707a46e";
 const FACTORY_MODULE = "factory";
 const FACTORY_FUNCTION = "create_token";
 
@@ -27,6 +28,7 @@ export default function TokenForm({ onSnackbar }) {
     metadataUri: "",
   });
   const [loading, setLoading] = useState(false);
+  const [deployedToken, setDeployedToken] = useState(null);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -86,6 +88,7 @@ export default function TokenForm({ onSnackbar }) {
           tx.pure("u8", decimalsNum),
           tx.pure("u64", initialSupplyBig),
           tx.pure("vector<u8>", metadataBytes),
+          tx.pure("u64", 0n), // fee_paid argument required by Move contract
         ],
       });
       // 1. Sign the transaction using the dApp Kit hook
@@ -100,6 +103,27 @@ export default function TokenForm({ onSnackbar }) {
         "Token creation transaction sent! Await backend deployment.",
         "success"
       );
+      // Try to extract packageId from events if available (devnet only, backend will confirm)
+      let packageId = null;
+      if (result.events && Array.isArray(result.events)) {
+        for (const ev of result.events) {
+          if (ev.type && ev.type.includes("TokenCreationEvent")) {
+            packageId = ev.packageId || (ev.parsedJson && ev.parsedJson.package_id) || null;
+            break;
+          }
+        }
+      }
+      if (packageId) {
+        setDeployedToken({
+          packageId,
+          name: form.name,
+          symbol: form.symbol,
+          decimals: decimalsNum,
+          initialSupply: initialSupplyBig.toString(),
+          metadataUri: form.metadataUri
+        });
+        onSnackbar(`Token contract deployed! Package ID: ${packageId}`, "success");
+      }
     } catch (err) {
       onSnackbar(`Transaction error: ${err.message}`, "error");
     }
@@ -107,62 +131,78 @@ export default function TokenForm({ onSnackbar }) {
   };
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
+    <Box>
       <Typography variant="h5">Create a New Token</Typography>
-      <TextField
-        label="Name"
-        name="name"
-        value={form.name}
-        onChange={handleChange}
-        fullWidth
-        required
-        sx={{ my: 1 }}
-      />
-      <TextField
-        label="Symbol"
-        name="symbol"
-        value={form.symbol}
-        onChange={handleChange}
-        fullWidth
-        required
-        sx={{ my: 1 }}
-      />
-      <TextField
-        label="Decimals"
-        name="decimals"
-        type="number"
-        value={form.decimals}
-        onChange={handleChange}
-        fullWidth
-        required
-        sx={{ my: 1 }}
-      />
-      <TextField
-        label="Initial Supply"
-        name="initialSupply"
-        type="number"
-        value={form.initialSupply}
-        onChange={handleChange}
-        fullWidth
-        required
-        sx={{ my: 1 }}
-      />
-      <TextField
-        label="Metadata URI"
-        name="metadataUri"
-        value={form.metadataUri}
-        onChange={handleChange}
-        fullWidth
-        sx={{ my: 1 }}
-      />
-      <Button
-        type="submit"
-        variant="contained"
-        disabled={loading}
-        sx={{ mt: 2 }}
-      >
-        {loading ? <CircularProgress size={22} /> : "Create Token"}
-      </Button>
+      <form onSubmit={handleSubmit}>
+        <TextField
+          label="Name"
+          name="name"
+          value={form.name}
+          onChange={handleChange}
+          fullWidth
+          required
+          sx={{ my: 1 }}
+        />
+        <TextField
+          label="Symbol"
+          name="symbol"
+          value={form.symbol}
+          onChange={handleChange}
+          fullWidth
+          required
+          sx={{ my: 1 }}
+        />
+        <TextField
+          label="Decimals"
+          name="decimals"
+          type="number"
+          value={form.decimals}
+          onChange={handleChange}
+          fullWidth
+          required
+          sx={{ my: 1 }}
+        />
+        <TextField
+          label="Initial Supply"
+          name="initialSupply"
+          type="number"
+          value={form.initialSupply}
+          onChange={handleChange}
+          fullWidth
+          required
+          sx={{ my: 1 }}
+        />
+        <TextField
+          label="Metadata URI"
+          name="metadataUri"
+          value={form.metadataUri}
+          onChange={handleChange}
+          fullWidth
+          sx={{ my: 1 }}
+        />
+        <Button
+          type="submit"
+          variant="contained"
+          disabled={loading}
+          sx={{ mt: 2 }}
+        >
+          {loading ? <CircularProgress size={22} /> : "Create Token"}
+        </Button>
+      </form>
+      {deployedToken && (
+        <Box mt={3}>
+          <Typography variant="subtitle1" color="success.main">Token Contract Deployed!</Typography>
+          <Card sx={{ mt: 2, p: 2, background: '#f6fff6' }}>
+            <Typography variant="body1"><b>Name:</b> {deployedToken.name}</Typography>
+            <Typography variant="body1"><b>Symbol:</b> {deployedToken.symbol}</Typography>
+            <Typography variant="body1"><b>Decimals:</b> {deployedToken.decimals}</Typography>
+            <Typography variant="body1"><b>Initial Supply:</b> {deployedToken.initialSupply}</Typography>
+            <Typography variant="body1"><b>Metadata URI:</b> {deployedToken.metadataUri}</Typography>
+            <Typography variant="body1"><b>Package ID:</b> <span style={{ wordBreak: 'break-all' }}>{deployedToken.packageId}</span></Typography>
+            <Button size="small" href={`https://suiexplorer.com/object/${deployedToken.packageId}?network=testnet`} target="_blank" sx={{ mt: 1 }}>View on Explorer</Button>
+          </Card>
+        </Box>
+      )}
     </Box>
   );
 }

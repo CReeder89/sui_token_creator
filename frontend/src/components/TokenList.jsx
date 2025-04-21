@@ -31,10 +31,25 @@ export default function TokenList({ onSnackbar }) {
   return (
     <Box>
       <Typography variant="h5">Your Deployed Tokens</Typography>
+      {loading && <CircularProgress sx={{ my: 2 }} />}
+      {tokens.length === 0 && !loading && (
+        <Typography color="text.secondary" sx={{ my: 2 }}>No tokens deployed yet.</Typography>
+      )}
       <List>
         {tokens.map((token) => (
           <ListItem button key={token.packageId} onClick={() => setSelected(token)}>
-            <ListItemText primary={`${token.name} (${token.symbol})`} secondary={`Package: ${token.packageId}`} />
+            <ListItemText
+              primary={`${token.name} (${token.symbol})`}
+              secondary={
+                <span>
+                  <b>Package:</b> <span style={{ wordBreak: 'break-all' }}>{token.packageId}</span><br />
+                  <b>Decimals:</b> {token.decimals} &nbsp; <b>Initial Supply:</b> {token.initialSupply}<br />
+                  <b>Metadata URI:</b> {token.metadataUri}
+                  <br />
+                  <Button size="small" href={`https://suiexplorer.com/object/${token.packageId}?network=testnet`} target="_blank" sx={{ mt: 1 }}>View on Explorer</Button>
+                </span>
+              }
+            />
           </ListItem>
         ))}
       </List>

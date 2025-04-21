@@ -3,12 +3,12 @@ import { SuiClientProvider, WalletProvider } from "@mysten/dapp-kit";
 import { getFullnodeUrl } from "@mysten/sui/client";
 
 const networks = {
-  devnet: { url: getFullnodeUrl("devnet") },
+  testnet: { url: getFullnodeUrl("testnet") },
 };
 
 export function DappKitProvider({ children }) {
   return (
-    <SuiClientProvider networks={networks} defaultNetwork="devnet">
+    <SuiClientProvider networks={networks} defaultNetwork="testnet">
       <WalletProvider autoConnect>{children}</WalletProvider>
     </SuiClientProvider>
   );

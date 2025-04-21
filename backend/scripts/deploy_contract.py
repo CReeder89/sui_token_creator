@@ -128,4 +128,5 @@ def deploy_token_contract(contract_dir, creator_address):
         print(f"[DeployContract] Exception: {e}")
         return {'success': False, 'error': str(e)}
     finally:
-        cleanup_package(contract_dir)
+        # cleanup_package(contract_dir)
+        pass
