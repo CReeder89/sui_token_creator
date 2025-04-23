@@ -8,7 +8,7 @@ from typing import Optional, List
 from scripts.deploy_contract import deploy_move_contract
 from scripts.sui_utils import get_user_tokens, mint_token, burn_token, transfer_token
 from scripts.move_package_utils import create_move_package
-from database import add_token_record, get_tokens_by_deployer
+from database import add_token_record, get_tokens_by_deployer, get_all_tokens
 from scripts.event_listener import start_event_listener
 
 app = FastAPI()
@@ -185,10 +185,17 @@ def my_tokens(req: UserTokensRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/api/user_tokens")
-def api_user_tokens(address: str):
-    """
-    Returns a list of token objects deployed/owned by the address.
-    """
-    tokens = get_user_tokens(address)
-    # For demo, just return the coins. In production, enrich with metadata.
-    return {"tokens": tokens}
+def get_user_tokens(address: str):
+    try:
+        tokens = get_tokens_by_deployer(address)
+        return {"tokens": tokens}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/all_tokens")
+def get_all_tokens_api():
+    try:
+        tokens = get_all_tokens()
+        return {"tokens": tokens}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -2,9 +2,10 @@ import time
 import threading
 from typing import Callable
 import requests
+from database import add_token_record
 
 SUI_FULLNODE = "https://fullnode.testnet.sui.io:443"
-PACKAGE_ID = "0x18dfdc7b1568eb9d6eac2057327ee2763e25473c4523bc635743b9b01707a46e"  # TODO: Set after deployment
+PACKAGE_ID = "0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a"  # TODO: Set after deployment
 MODULE_NAME = "factory"
 EVENT_STRUCT = "TokenCreationEvent"
 
@@ -92,6 +93,7 @@ def handle_token_creation_event(event):
     decimals = event_fields.get('decimals')
     initial_supply = event_fields.get('initial_supply')
     metadata_uri = event_fields.get('metadata_uri')
+    description = event_fields.get('description', '')
 
     def decode_bytes(val):
         if isinstance(val, list):
@@ -105,13 +107,14 @@ def handle_token_creation_event(event):
     name = decode_bytes(name)
     symbol = decode_bytes(symbol)
     metadata_uri = decode_bytes(metadata_uri)
-    print(f"[EventListener] Decoded values: name='{name}', symbol='{symbol}', metadata_uri='{metadata_uri}'")
+    description = decode_bytes(description)
+    print(f"[EventListener] Decoded values: name='{name}', symbol='{symbol}', metadata_uri='{metadata_uri}', description='{description}'")
     print(f"[EventListener] decimals={decimals}, initial_supply={initial_supply}, creator={creator}")
 
     try:
         from scripts.deploy_contract import generate_token_contract, deploy_token_contract
         print("[EventListener] Calling generate_token_contract...")
-        contract_dir = generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri)
+        contract_dir = generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri, description, creator)
         print(f"[EventListener] Contract directory generated: {contract_dir}")
         import os
         if os.path.exists(contract_dir):
@@ -122,7 +125,20 @@ def handle_token_creation_event(event):
         deploy_result = deploy_token_contract(contract_dir, creator)
         print(f"[EventListener] Deploy result: {deploy_result}")
         if deploy_result.get('success'):
-            print(f"[EventListener][DEBUG] Contract deployed successfully! Package ID: {deploy_result.get('package_id')}")
+            package_id = deploy_result.get('package_id')
+            print(f"[EventListener][DEBUG] Contract deployed successfully! Package ID: {package_id}")
+            # Store deployed token contract info in tokens_db.json
+            token_info = {
+                "creator": creator,
+                "name": name,
+                "symbol": symbol,
+                "decimals": decimals,
+                "description": description,
+                "metadata_uri": metadata_uri,
+                "initial_supply": initial_supply,
+                "package_id": package_id,
+            }
+            add_token_record(token_info)
         else:
             print(f"[EventListener][DEBUG] Contract deployment failed: {deploy_result.get('error')}")
     except Exception as e:

@@ -8,6 +8,7 @@ export default defineConfig({
       '/generate_contract': 'http://localhost:8000',
       '/deploy_contract': 'http://localhost:8000',
       '/my_tokens': 'http://localhost:8000',
+      '/api': 'http://127.0.0.1:8000',
     },
   },
 });

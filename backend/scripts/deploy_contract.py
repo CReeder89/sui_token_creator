@@ -38,57 +38,30 @@ def deploy_move_contract(move_code, module_name, deployer_address, private_key):
         os.remove(key_file)
         cleanup_package(package_dir)
 
-def generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri):
+def generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri, description, deployer_address):
     """
-    Generate a Move contract for a custom Sui token with the given parameters.
+    Generate a Move contract for a custom Sui token with the given parameters using the static template.
     Returns the path to the contract directory.
     """
-    # Fill in the Move template with user parameters
-    module_name = symbol.upper()
-    move_code = f"""
-module {module_name}::token {{
-    use sui::coin;
-    use sui::tx_context::sender;
-    use sui::transfer;
+    import os
+    # Read the Move template
+    template_path = os.path.join(os.path.dirname(__file__), "../templates/fungible_token_template.move")
+    with open(template_path, "r") as f:
+        template = f.read()
 
-    public struct {symbol} has store, copy, drop {{}}
+    # Fill in the template variables
+    move_code = (
+        template
+        .replace("{{name}}", name)
+        .replace("{{symbol}}", symbol)
+        .replace("{{description}}", description)
+        .replace("{{icon_url}}", metadata_uri)
+        .replace("{{decimals}}", str(decimals))
+        .replace("{{initial_supply}}", str(initial_supply))
+        .replace("{{deployer_address}}", deployer_address)
+    )
 
-    public fun mint(
-        treasury_cap: &mut coin::TreasuryCap<{symbol}>,
-        amount: u64,
-        recipient: address,
-        ctx: &mut sui::tx_context::TxContext
-    ) {{
-        let coin = coin::mint<{symbol}>(treasury_cap, amount, ctx);
-        transfer::public_transfer(coin, recipient);
-    }}
-
-    public fun burn(
-        treasury_cap: &mut coin::TreasuryCap<{symbol}>,
-        amount: u64,
-        ctx: &mut sui::tx_context::TxContext
-    ) {{
-        let coin = coin::mint<{symbol}>(treasury_cap, amount, ctx);
-        coin::burn(treasury_cap, coin);
-    }}
-
-    public fun transfer(
-        mut coin: coin::Coin<{symbol}>,
-        recipient: address,
-        amount: u64,
-        ctx: &mut sui::tx_context::TxContext
-    ) {{
-        let send = coin::split(&mut coin, amount, ctx);
-        transfer::public_transfer(send, recipient);
-        if (coin::value(&coin) > 0) {{
-            transfer::public_transfer(coin, sender(ctx));
-        }} else {{
-            coin::destroy_zero(coin);
-        }}
-    }}
-}}
-"""
-    # Create the Move package directory
+    module_name = "token_contract"
     package_root = "/tmp/sui_move_packages"
     os.makedirs(package_root, exist_ok=True)
     package_dir = create_move_package(package_root, module_name, move_code)

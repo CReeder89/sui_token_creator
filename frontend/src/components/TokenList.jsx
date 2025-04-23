@@ -1,56 +1,53 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, List, ListItem, ListItemText, Button, CircularProgress } from "@mui/material";
+import { Box, Typography, List, Card, Button } from "@mui/material";
 import { useCurrentAccount } from "@mysten/dapp-kit";
-import TokenProfile from "./TokenProfile";
 
 export default function TokenList({ onSnackbar }) {
   const account = useCurrentAccount();
   const [tokens, setTokens] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selected, setSelected] = useState(null);
 
   useEffect(() => {
     if (!account) return;
     setLoading(true);
     fetch(`/api/user_tokens?address=${account.address}`)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error("API error");
+        return res.json();
+      })
       .then((data) => {
         setTokens(data.tokens || []);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        setLoading(false);
+        onSnackbar && onSnackbar("Error fetching tokens: " + err.message, "error");
+      });
   }, [account]);
 
   if (!account) return <Typography>Connect your wallet to view your tokens.</Typography>;
-  if (loading) return <CircularProgress />;
-
-  if (selected) {
-    return <TokenProfile tokenInfo={selected} onSnackbar={onSnackbar} />;
-  }
+  if (loading) return <Typography>Loading...</Typography>;
 
   return (
     <Box>
       <Typography variant="h5">Your Deployed Tokens</Typography>
-      {loading && <CircularProgress sx={{ my: 2 }} />}
+      {loading && <Typography>Loading...</Typography>}
       {tokens.length === 0 && !loading && (
         <Typography color="text.secondary" sx={{ my: 2 }}>No tokens deployed yet.</Typography>
       )}
       <List>
         {tokens.map((token) => (
-          <ListItem button key={token.packageId} onClick={() => setSelected(token)}>
-            <ListItemText
-              primary={`${token.name} (${token.symbol})`}
-              secondary={
-                <span>
-                  <b>Package:</b> <span style={{ wordBreak: 'break-all' }}>{token.packageId}</span><br />
-                  <b>Decimals:</b> {token.decimals} &nbsp; <b>Initial Supply:</b> {token.initialSupply}<br />
-                  <b>Metadata URI:</b> {token.metadataUri}
-                  <br />
-                  <Button size="small" href={`https://suiexplorer.com/object/${token.packageId}?network=testnet`} target="_blank" sx={{ mt: 1 }}>View on Explorer</Button>
-                </span>
-              }
-            />
-          </ListItem>
+          <Card key={token.package_id} sx={{ my: 2 }}>
+            <Typography variant="body1"><b>Name:</b> {token.name}</Typography>
+            <Typography variant="body1"><b>Symbol:</b> {token.symbol}</Typography>
+            <Typography variant="body1"><b>Decimals:</b> {token.decimals}</Typography>
+            <Typography variant="body1"><b>Description:</b> {token.description}</Typography>
+            <Typography variant="body1"><b>Initial Supply:</b> {token.initial_supply}</Typography>
+            <Typography variant="body1"><b>Metadata URI:</b> {token.metadata_uri}</Typography>
+            <Typography variant="body1"><b>Package ID:</b> <span style={{ wordBreak: 'break-all' }}>{token.package_id}</span></Typography>
+            <Button size="small" href={`https://suiexplorer.com/object/${token.package_id}?network=testnet`} target="_blank" sx={{ mt: 1 }}>View on Explorer</Button>
+            {/* Optionally: Mint, Burn, Transfer buttons */}
+          </Card>
         ))}
       </List>
     </Box>

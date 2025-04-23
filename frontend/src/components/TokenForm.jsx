@@ -1,18 +1,15 @@
 import React, { useState } from "react";
-import {
-  Box,
-  Typography,
-  TextField,
-  Button,
-  CircularProgress,
-  Card,
-} from "@mui/material";
+import { Box, Typography, TextField, Button, Card } from "@mui/material";
 import { Transaction } from "@mysten/sui/transactions";
-import { useCurrentAccount, useSignTransaction, useSuiClient } from "@mysten/dapp-kit";
+import {
+  useCurrentAccount,
+  useSignTransaction,
+  useSuiClient,
+} from "@mysten/dapp-kit";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
 const FACTORY_PACKAGE_ID =
-  "0x18dfdc7b1568eb9d6eac2057327ee2763e25473c4523bc635743b9b01707a46e";
+  "0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a";
 const FACTORY_MODULE = "factory";
 const FACTORY_FUNCTION = "create_token";
 
@@ -26,8 +23,9 @@ export default function TokenForm({ onSnackbar }) {
     decimals: 9,
     initialSupply: "",
     metadataUri: "",
+    description: "",
   });
-  const [loading, setLoading] = useState(false);
+  const [deploying, setDeploying] = useState(false);
   const [deployedToken, setDeployedToken] = useState(null);
 
   const handleChange = (e) => {
@@ -36,7 +34,13 @@ export default function TokenForm({ onSnackbar }) {
 
   // Defensive field validation before transaction
   const validateForm = () => {
-    if (!form.name || !form.symbol || !form.decimals || !form.initialSupply) {
+    if (
+      !form.name ||
+      !form.symbol ||
+      !form.decimals ||
+      !form.initialSupply ||
+      !form.description
+    ) {
       onSnackbar("All fields except metadata URI are required.", "error");
       return false;
     }
@@ -62,15 +66,16 @@ export default function TokenForm({ onSnackbar }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setDeploying(true);
     if (!account) {
       onSnackbar("Connect your wallet!", "error");
+      setDeploying(false);
       return;
     }
     if (!validateForm()) {
-      setLoading(false);
+      setDeploying(false);
       return;
     }
-    setLoading(true);
     try {
       // Prepare arguments for create_token using correct types
       const nameBytes = new TextEncoder().encode(form.name);
@@ -78,6 +83,7 @@ export default function TokenForm({ onSnackbar }) {
       const decimalsNum = Number(form.decimals);
       const initialSupplyBig = BigInt(form.initialSupply);
       const metadataBytes = new TextEncoder().encode(form.metadataUri);
+      const descriptionBytes = new TextEncoder().encode(form.description);
 
       const tx = new Transaction();
       tx.moveCall({
@@ -88,7 +94,7 @@ export default function TokenForm({ onSnackbar }) {
           tx.pure("u8", decimalsNum),
           tx.pure("u64", initialSupplyBig),
           tx.pure("vector<u8>", metadataBytes),
-          tx.pure("u64", 0n), // fee_paid argument required by Move contract
+          tx.pure("vector<u8>", descriptionBytes),
         ],
       });
       // 1. Sign the transaction using the dApp Kit hook
@@ -99,36 +105,36 @@ export default function TokenForm({ onSnackbar }) {
         signature: signed.signature,
         options: { showEffects: true, showEvents: true },
       });
-      onSnackbar(
-        "Token creation transaction sent! Await backend deployment.",
-        "success"
-      );
-      // Try to extract packageId from events if available (devnet only, backend will confirm)
-      let packageId = null;
-      if (result.events && Array.isArray(result.events)) {
-        for (const ev of result.events) {
-          if (ev.type && ev.type.includes("TokenCreationEvent")) {
-            packageId = ev.packageId || (ev.parsedJson && ev.parsedJson.package_id) || null;
-            break;
-          }
-        }
-      }
-      if (packageId) {
-        setDeployedToken({
-          packageId,
-          name: form.name,
-          symbol: form.symbol,
-          decimals: decimalsNum,
-          initialSupply: initialSupplyBig.toString(),
-          metadataUri: form.metadataUri
-        });
-        onSnackbar(`Token contract deployed! Package ID: ${packageId}`, "success");
-      }
+      onSnackbar("Deploying your token contract...", "info");
+      pollForDeployedToken();
     } catch (err) {
       onSnackbar(`Transaction error: ${err.message}`, "error");
+      setDeploying(false);
     }
-    setLoading(false);
   };
+
+  function pollForDeployedToken() {
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`/api/user_tokens?address=${account.address}`);
+        if (!res.ok) throw new Error("API error");
+        const data = await res.json();
+        const found = data.tokens.find(
+          (t) => t.name === form.name && t.symbol === form.symbol
+        );
+        if (found) {
+          setDeploying(false);
+          setDeployedToken(found);
+          onSnackbar("Token contract deployed!", "success");
+          clearInterval(interval);
+        }
+      } catch (err) {
+        setDeploying(false);
+        onSnackbar("Error fetching deployed token info.", "error");
+        clearInterval(interval);
+      }
+    }, 3000);
+  }
 
   return (
     <Box>
@@ -180,26 +186,62 @@ export default function TokenForm({ onSnackbar }) {
           fullWidth
           sx={{ my: 1 }}
         />
+        <TextField
+          label="Description"
+          name="description"
+          value={form.description}
+          onChange={handleChange}
+          fullWidth
+          required
+          sx={{ my: 1 }}
+        />
         <Button
           type="submit"
           variant="contained"
-          disabled={loading}
+          disabled={deploying}
           sx={{ mt: 2 }}
         >
-          {loading ? <CircularProgress size={22} /> : "Create Token"}
+          {deploying ? "Deploying..." : "Create Token"}
         </Button>
       </form>
       {deployedToken && (
         <Box mt={3}>
-          <Typography variant="subtitle1" color="success.main">Token Contract Deployed!</Typography>
-          <Card sx={{ mt: 2, p: 2, background: '#f6fff6' }}>
-            <Typography variant="body1"><b>Name:</b> {deployedToken.name}</Typography>
-            <Typography variant="body1"><b>Symbol:</b> {deployedToken.symbol}</Typography>
-            <Typography variant="body1"><b>Decimals:</b> {deployedToken.decimals}</Typography>
-            <Typography variant="body1"><b>Initial Supply:</b> {deployedToken.initialSupply}</Typography>
-            <Typography variant="body1"><b>Metadata URI:</b> {deployedToken.metadataUri}</Typography>
-            <Typography variant="body1"><b>Package ID:</b> <span style={{ wordBreak: 'break-all' }}>{deployedToken.packageId}</span></Typography>
-            <Button size="small" href={`https://suiexplorer.com/object/${deployedToken.packageId}?network=testnet`} target="_blank" sx={{ mt: 1 }}>View on Explorer</Button>
+          <Typography variant="subtitle1" color="success.main">
+            Token Contract Deployed!
+          </Typography>
+          <Card sx={{ mt: 2, p: 2, background: "#f6fff6" }}>
+            <Typography variant="body1">
+              <b>Name:</b> {deployedToken.name}
+            </Typography>
+            <Typography variant="body1">
+              <b>Symbol:</b> {deployedToken.symbol}
+            </Typography>
+            <Typography variant="body1">
+              <b>Decimals:</b> {deployedToken.decimals}
+            </Typography>
+            <Typography variant="body1">
+              <b>Initial Supply:</b> {deployedToken.initialSupply}
+            </Typography>
+            <Typography variant="body1">
+              <b>Metadata URI:</b> {deployedToken.metadataUri}
+            </Typography>
+            <Typography variant="body1">
+              <b>Description:</b> {deployedToken.description}
+            </Typography>
+            <Typography variant="body1">
+              <b>Package ID:</b>{" "}
+              <span style={{ wordBreak: "break-all" }}>
+                {deployedToken.packageId}
+              </span>
+            </Typography>
+            <Button
+              size="small"
+              href={`https://suiexplorer.com/object/${deployedToken.packageId}?network=testnet`}
+              target="_blank"
+              sx={{ mt: 1 }}
+            >
+              View on Explorer
+            </Button>
           </Card>
         </Box>
       )}

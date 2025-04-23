@@ -22,7 +22,14 @@ def get_tokens_by_deployer(deployer_address):
     with _db_lock:
         with open(DB_FILE, 'r') as f:
             data = json.load(f)
-        return [rec for rec in data if rec.get('deployer_address') == deployer_address]
+        # Normalize both addresses for comparison (lowercase, with 0x prefix)
+        norm_addr = deployer_address.lower()
+        def norm(a):
+            a = a.lower()
+            if not a.startswith('0x'):
+                a = '0x' + a
+            return a
+        return [rec for rec in data if norm(rec.get('creator', '')) == norm(norm_addr)]
 
 def get_all_tokens():
     with _db_lock:

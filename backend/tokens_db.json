@@ -1,1 +1,42 @@
-[]
+[
+  {
+    "creator": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee",
+    "name": "Sachin",
+    "symbol": "SHN",
+    "decimals": 9,
+    "description": "",
+    "metadata_uri": "https://images.unsplash.com/photo-1575936123452-b67c3203c357?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
+    "initial_supply": "10000000000",
+    "package_id": "0x9443ea086b577fed310388fee986f043daea02073be994f0d191ae98fc3b80c3"
+  },
+  {
+    "creator": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee",
+    "name": "Hatim",
+    "symbol": "HTM",
+    "decimals": 9,
+    "description": "",
+    "metadata_uri": "https://avatars.githubusercontent.com/u/95741246?v=4",
+    "initial_supply": "1000000000",
+    "package_id": "0xf8d1c382a770bd0b92e3e7519347e83be2b82e13f49a425908d45fc544a670e5"
+  },
+  {
+    "creator": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee",
+    "name": "bhola",
+    "symbol": "BHL",
+    "decimals": 9,
+    "description": "Bhoside ke",
+    "metadata_uri": "https://cdn3d.iconscout.com/3d/premium/thumb/sui-coin-3d-icon-download-in-png-blend-fbx-gltf-file-formats--crypto-cryptocurrency-pack-science-technology-icons-7479564.png",
+    "initial_supply": "100000000",
+    "package_id": "0x097b1a094a82711750495e783c0d6fc154807f09c2ad5fe892bc58a8b67c93b1"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "bho",
+    "symbol": "BKL",
+    "decimals": 9,
+    "description": "Harami ke",
+    "metadata_uri": "https://cdn3d.iconscout.com/3d/premium/thumb/sui-coin-3d-icon-download-in-png-blend-fbx-gltf-file-formats--crypto-cryptocurrency-pack-science-technology-icons-7479564.png",
+    "initial_supply": "100000000",
+    "package_id": "0x1e3bc1ac218037134d514a613f0c1519f556586f8fca1b2a592e8d7903ca2d6b"
+  }
+]
