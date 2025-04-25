@@ -111,6 +111,11 @@ def handle_token_creation_event(event):
     print(f"[EventListener] Decoded values: name='{name}', symbol='{symbol}', metadata_uri='{metadata_uri}', description='{description}'")
     print(f"[EventListener] decimals={decimals}, initial_supply={initial_supply}, creator={creator}")
 
+    # --- Ensure initial_supply is always stored as a string representing the base unit value ---
+    # If initial_supply is not already a string, convert it
+    if initial_supply is not None:
+        initial_supply = str(initial_supply)
+
     try:
         from scripts.deploy_contract import generate_token_contract, deploy_token_contract
         print("[EventListener] Calling generate_token_contract...")
@@ -135,7 +140,7 @@ def handle_token_creation_event(event):
                 "decimals": decimals,
                 "description": description,
                 "metadata_uri": metadata_uri,
-                "initial_supply": initial_supply,
+                "initial_supply": initial_supply,  # Always string base units
                 "package_id": package_id,
             }
             add_token_record(token_info)

@@ -90,7 +90,12 @@ def generate_contract(params: ContractParams):
     contract_code = contract_code.replace("{{decimals}}", str(params.decimals))
     contract_code = contract_code.replace("{{description}}", params.description)
     contract_code = contract_code.replace("{{icon_url}}", params.icon_url or "")
-    contract_code = contract_code.replace("{{initial_supply}}", str(params.initial_supply))
+    # --- CRITICAL: Ensure initial_supply is always in base units (frontend should send this, but double check and multiply here if not) ---
+    initial_supply = params.initial_supply
+    if initial_supply < 10 ** int(params.decimals):
+        # If user sent a small number, assume it's not in base units and multiply
+        initial_supply = int(params.initial_supply) * (10 ** int(params.decimals))
+    contract_code = contract_code.replace("{{initial_supply}}", str(initial_supply))
 
     # Handle methods
     def handle_method(method, present):
@@ -129,6 +134,7 @@ def generate_contract(params: ContractParams):
 
 @app.post("/deploy_contract")
 def deploy_contract(params: DeployParams):
+    print("[DEBUG] /deploy_contract endpoint called with params:", params)
     try:
         tx_hash, package_id = deploy_move_contract(
             params.move_code,
@@ -136,7 +142,8 @@ def deploy_contract(params: DeployParams):
             params.deployer_address,
             params.private_key
         )
-        record = {
+        # Compose token info (ensure all fields, including initial_supply, are present)
+        token_info = {
             "module_name": params.module_name,
             "deployer_address": params.deployer_address,
             "tx_hash": tx_hash,
@@ -146,9 +153,12 @@ def deploy_contract(params: DeployParams):
             "symbol": getattr(params, 'symbol', None),
             "decimals": getattr(params, 'decimals', None),
             "description": getattr(params, 'description', None),
+            "icon_url": getattr(params, 'icon_url', None),
+            "initial_supply": str(getattr(params, 'initial_supply', None)),
         }
-        add_token_record(record)
-        return {"status": "success", "tx_hash": tx_hash, "package_id": package_id}
+        print("[DEBUG] Returning deploy_contract token_info:", token_info)
+        add_token_record(token_info)
+        return {"status": "success", **token_info}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

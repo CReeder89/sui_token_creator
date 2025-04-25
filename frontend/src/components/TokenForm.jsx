@@ -81,9 +81,29 @@ export default function TokenForm({ onSnackbar }) {
       const nameBytes = new TextEncoder().encode(form.name);
       const symbolBytes = new TextEncoder().encode(form.symbol);
       const decimalsNum = Number(form.decimals);
-      const initialSupplyBig = BigInt(form.initialSupply);
+      // Multiply initial supply by 10 ** decimals before sending to contract
+      const initialSupplyBig =
+        BigInt(form.initialSupply) * 10n ** BigInt(decimalsNum);
       const metadataBytes = new TextEncoder().encode(form.metadataUri);
       const descriptionBytes = new TextEncoder().encode(form.description);
+
+      // Log what will be sent to the TokenFactory contract
+      console.log("[TokenForm] Calling TokenFactory contract with:", {
+        name: form.name,
+        symbol: form.symbol,
+        decimals: decimalsNum,
+        initialSupply: initialSupplyBig.toString(),
+        metadataUri: form.metadataUri,
+        description: form.description,
+        encodedArgs: {
+          nameBytes,
+          symbolBytes,
+          decimalsNum,
+          initialSupplyBig: initialSupplyBig.toString(),
+          metadataBytes,
+          descriptionBytes,
+        },
+      });
 
       const tx = new Transaction();
       tx.moveCall({
@@ -114,18 +134,35 @@ export default function TokenForm({ onSnackbar }) {
   };
 
   function pollForDeployedToken() {
+    const MAX_ATTEMPTS = 20; // e.g., 20 attempts x 3s = 60 seconds
+    let attempts = 0;
     const interval = setInterval(async () => {
+      attempts++;
       try {
         const res = await fetch(`/api/user_tokens?address=${account.address}`);
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
+        console.log("[TokenForm] Polling for deployed token:", data);
         const found = data.tokens.find(
-          (t) => t.name === form.name && t.symbol === form.symbol
+          (t) =>
+            t.name === form.name &&
+            t.symbol === form.symbol &&
+            (t.packageId || t.package_id) // Only accept if packageId is present
         );
         if (found) {
           setDeploying(false);
           setDeployedToken(found);
+          console.log("[TokenForm] Deployed token info for green card:", found);
           onSnackbar("Token contract deployed!", "success");
+          clearInterval(interval);
+          return;
+        }
+        if (attempts >= MAX_ATTEMPTS) {
+          setDeploying(false);
+          onSnackbar(
+            "Token deployment failed or took too long. Please try again or contact support.",
+            "error"
+          );
           clearInterval(interval);
         }
       } catch (err) {
@@ -220,10 +257,10 @@ export default function TokenForm({ onSnackbar }) {
               <b>Decimals:</b> {deployedToken.decimals}
             </Typography>
             <Typography variant="body1">
-              <b>Initial Supply:</b> {deployedToken.initialSupply}
+              <b>Initial Supply:</b> {deployedToken.initial_supply || deployedToken.initialSupply}
             </Typography>
             <Typography variant="body1">
-              <b>Metadata URI:</b> {deployedToken.metadataUri}
+              <b>Metadata URI:</b> {deployedToken.metadata_uri || deployedToken.metadataUri}
             </Typography>
             <Typography variant="body1">
               <b>Description:</b> {deployedToken.description}
@@ -231,12 +268,12 @@ export default function TokenForm({ onSnackbar }) {
             <Typography variant="body1">
               <b>Package ID:</b>{" "}
               <span style={{ wordBreak: "break-all" }}>
-                {deployedToken.packageId}
+                {deployedToken.package_id || deployedToken.packageId}
               </span>
             </Typography>
             <Button
               size="small"
-              href={`https://suiexplorer.com/object/${deployedToken.packageId}?network=testnet`}
+              href={`https://suiexplorer.com/object/${deployedToken.package_id || deployedToken.packageId}?network=testnet`}
               target="_blank"
               sx={{ mt: 1 }}
             >

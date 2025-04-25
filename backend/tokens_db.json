@@ -38,5 +38,105 @@
     "metadata_uri": "https://cdn3d.iconscout.com/3d/premium/thumb/sui-coin-3d-icon-download-in-png-blend-fbx-gltf-file-formats--crypto-cryptocurrency-pack-science-technology-icons-7479564.png",
     "initial_supply": "100000000",
     "package_id": "0x1e3bc1ac218037134d514a613f0c1519f556586f8fca1b2a592e8d7903ca2d6b"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "MyToken",
+    "symbol": "TKN",
+    "decimals": 9,
+    "description": "My new Golden token",
+    "metadata_uri": "https://png.pngtree.com/png-clipart/20220603/original/pngtree-convex-finance-crypto-icon-png-image_7902923.png",
+    "initial_supply": "100",
+    "package_id": "0xfba6de8f228a211499a2428fdd11d5128f27cfc064391cf29704c51071b16b86"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "Hello",
+    "symbol": "Hola",
+    "decimals": 9,
+    "description": "Hola token",
+    "metadata_uri": "https://avatars.githubusercontent.com/u/95741246?v=4",
+    "initial_supply": "100",
+    "package_id": "0xb1add0ef0c9817d8b6fa510d6d8e908c390299c6c9f65fcffcd28fc66f1685a4"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "Last Token",
+    "symbol": "LST",
+    "decimals": 9,
+    "description": "diamond token",
+    "metadata_uri": "https://i.pinimg.com/474x/fb/4e/82/fb4e8296041cbd707857e481fd6eea70.jpg",
+    "initial_supply": "100",
+    "package_id": "0x775a2ebb7ff40f9d53bfef377bc201ddfa1069aea194f034fc524ddc00d944c8"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "Happy",
+    "symbol": "HPPY",
+    "decimals": 9,
+    "description": "gola investment firm youtuber token coin",
+    "metadata_uri": "https://cdn3d.iconscout.com/3d/premium/thumb/sui-coin-3d-icon-download-in-png-blend-fbx-gltf-file-formats--crypto-cryptocurrency-pack-science-technology-icons-7479564.png",
+    "initial_supply": "100",
+    "package_id": "0x8a34c56b55d642e9bd04117423e51cb46d469fe87246c5a5b8081252d5e1239c"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "KALA",
+    "symbol": "KLA",
+    "decimals": 9,
+    "description": "web3 game",
+    "metadata_uri": "https://cdn3d.iconscout.com/3d/premium/thumb/sui-coin-3d-icon-download-in-png-blend-fbx-gltf-file-formats--crypto-cryptocurrency-pack-science-technology-icons-7479564.png",
+    "initial_supply": "100",
+    "package_id": "0x5312a4d39896fc40a7394b6f96634628135fdb214f6a1792c0b850b57fdd1491"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "KAL",
+    "symbol": "KL",
+    "decimals": 9,
+    "description": "web3 game",
+    "metadata_uri": "https://cdn3d.iconscout.com/3d/premium/thumb/sui-coin-3d-icon-download-in-png-blend-fbx-gltf-file-formats--crypto-cryptocurrency-pack-science-technology-icons-7479564.png",
+    "initial_supply": "100",
+    "package_id": "0x25987259f48e242f81d41c1aae4fb9c89eefaedfd5a98473d1d100cbb2013bad"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "token nya",
+    "symbol": "TULA",
+    "decimals": 9,
+    "description": "gola investment firm",
+    "metadata_uri": "https://avatars.githubusercontent.com/u/95741246?v=4",
+    "initial_supply": "100",
+    "package_id": "0x5aef38c82e54a9da1f1589f9fe72b37078c8460cf9fd52305dc01b28c89ff5bc"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "token nya",
+    "symbol": "TULA",
+    "decimals": 9,
+    "description": "gola investment firm",
+    "metadata_uri": "https://avatars.githubusercontent.com/u/95741246?v=4",
+    "initial_supply": "100",
+    "package_id": "0x9a28af5b3b2a74ee8ce55666bc5e520e8b8dc350445f193b05d8c94ff9cc88f1"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "TULATY",
+    "symbol": "TOFF",
+    "decimals": 9,
+    "description": "safaldsa",
+    "metadata_uri": "https://images.unsplash.com/photo-1575936123452-b67c3203c357?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
+    "initial_supply": "100000000000",
+    "package_id": "0x5b507ef6a0962a614e4daba952b6d0a213aedeb9e45873025828438a4c0d9b80"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "BEST TOKEN",
+    "symbol": "BTS",
+    "decimals": 9,
+    "description": "BTS token Look at me Look at you you wanna guesso",
+    "metadata_uri": "https://s2.coinmarketcap.com/static/img/coins/200x200/463.png",
+    "initial_supply": "10000000000",
+    "package_id": "0xd7897e5eb065ad137b4d52dffb2c2b337d6d0c3d02565bbb35fe2343fa03e06b"
   }
 ]

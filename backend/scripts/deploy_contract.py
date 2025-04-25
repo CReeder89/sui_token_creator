@@ -50,6 +50,7 @@ def generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri
         template = f.read()
 
     # Fill in the template variables
+    # Ensure initial_supply is always a string representing the base unit value
     move_code = (
         template
         .replace("{{name}}", name)
