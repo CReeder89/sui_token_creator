@@ -1,5 +1,7 @@
+import { BACKEND_URL } from './config';
+
 export async function generateContract(params) {
-  const res = await fetch('/generate_contract', {
+  const res = await fetch(`${BACKEND_URL}/generate_contract`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params)
@@ -8,7 +10,7 @@ export async function generateContract(params) {
 }
 
 export async function deployContract(params) {
-  const res = await fetch('/deploy_contract', {
+  const res = await fetch(`${BACKEND_URL}/deploy_contract`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(params)
@@ -17,7 +19,7 @@ export async function deployContract(params) {
 }
 
 export async function getMyTokens(address) {
-  const res = await fetch('/my_tokens', {
+  const res = await fetch(`${BACKEND_URL}/my_tokens`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ address })

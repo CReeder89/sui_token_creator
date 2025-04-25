@@ -7,6 +7,7 @@ import {
   useSuiClient,
 } from "@mysten/dapp-kit";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
+import { BACKEND_URL } from "../config";
 
 const FACTORY_PACKAGE_ID =
   "0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a";
@@ -139,7 +140,7 @@ export default function TokenForm({ onSnackbar }) {
     const interval = setInterval(async () => {
       attempts++;
       try {
-        const res = await fetch(`/api/user_tokens?address=${account.address}`);
+        const res = await fetch(`${BACKEND_URL}/api/user_tokens?address=${account.address}`);
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
         console.log("[TokenForm] Polling for deployed token:", data);

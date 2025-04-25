@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Typography, List, Card, Button } from "@mui/material";
 import { useCurrentAccount } from "@mysten/dapp-kit";
+import { BACKEND_URL } from '../config';
 
 export default function TokenList({ onSnackbar }) {
   const account = useCurrentAccount();
@@ -10,7 +11,7 @@ export default function TokenList({ onSnackbar }) {
   useEffect(() => {
     if (!account) return;
     setLoading(true);
-    fetch(`/api/user_tokens?address=${account.address}`)
+    fetch(`${BACKEND_URL}/api/user_tokens?address=${account.address}`)
       .then((res) => {
         if (!res.ok) throw new Error("API error");
         return res.json();
