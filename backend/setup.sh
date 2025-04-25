@@ -6,23 +6,9 @@ set -e
 echo "Installing Python dependencies from requirements.txt..."
 pip install -r requirements.txt
 
-# Install Homebrew if not installed
-if ! command -v brew &> /dev/null; then
-    echo "Homebrew not found. Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-else
-    echo "Homebrew already installed."
-fi
-
-# Ensure Homebrew is up to date
-brew update
-
-# Install Sui CLI if not installed
-if ! command -v sui &> /dev/null; then
-    echo "Installing Sui CLI via Homebrew..."
-    brew install sui
-else
-    echo "Sui CLI already installed."
-fi
+# Download latest Sui release (replace <VERSION> with actual version/tag)
+wget https://github.com/MystenLabs/sui/releases/download/mainnet-v1.47.1/sui-ubuntu-x86_64.tgz
+tar -xzf sui-ubuntu-x86_64.tgz
+sudo mv sui /usr/local/bin/
 
 echo "All dependencies installed successfully!"
