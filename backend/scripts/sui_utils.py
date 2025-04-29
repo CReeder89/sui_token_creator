@@ -1,5 +1,6 @@
 import subprocess
 import json
+from config import SUI_CLI_PATH
 
 def get_user_tokens(address):
     """
@@ -8,7 +9,7 @@ def get_user_tokens(address):
     """
     # Example: use sui client objects --address <address> --json
     cmd = [
-        "sui",
+        SUI_CLI_PATH,
         "client",
         "objects",
         "--address", address,
@@ -24,7 +25,8 @@ def get_user_tokens(address):
 def mint_token(params):
     # Assumes Sui CLI is installed and configured for testnet
     cmd = [
-        "sui", "client", "call",
+        SUI_CLI_PATH,
+        "client", "call",
         "--package", params.package_id,
         "--module", params.module_name,
         "--function", "mint",
@@ -40,7 +42,8 @@ def mint_token(params):
 
 def burn_token(params):
     cmd = [
-        "sui", "client", "call",
+        SUI_CLI_PATH,
+        "client", "call",
         "--package", params.package_id,
         "--module", params.module_name,
         "--function", "burn",
@@ -56,7 +59,8 @@ def burn_token(params):
 
 def transfer_token(params):
     cmd = [
-        "sui", "client", "call",
+        SUI_CLI_PATH,
+        "client", "call",
         "--package", params.package_id,
         "--module", params.module_name,
         "--function", "transfer",
@@ -77,7 +81,8 @@ def transfer_token_capabilities(package_id, creator_address):
     """
     # Find TreasuryCap object
     cmd = [
-        "sui", "client", "objects", "--address", creator_address, "--json"
+        SUI_CLI_PATH,
+        "client", "objects", "--address", creator_address, "--json"
     ]
     result = subprocess.run(cmd, capture_output=True, check=True)
     output = result.stdout.decode()

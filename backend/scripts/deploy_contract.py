@@ -1,3 +1,4 @@
+from config import SUI_CLI_PATH
 import subprocess
 import os
 import uuid
@@ -20,12 +21,12 @@ def deploy_move_contract(move_code, module_name, deployer_address, private_key):
     try:
         # Build the Move package
         build_cmd = [
-            "sui", "move", "build", "--path", package_dir
+            SUI_CLI_PATH, "move", "build", "--path", package_dir
         ]
         subprocess.run(build_cmd, check=True)
         # Publish the package
         publish_cmd = [
-            "sui", "client", "publish", "--gas-budget", "100000000", "--json", "--key-file", key_file, "--path", package_dir
+            SUI_CLI_PATH, "client", "publish", "--gas-budget", "100000000", "--json", "--key-file", key_file, "--path", package_dir
         ]
         result = subprocess.run(publish_cmd, capture_output=True, check=True)
         output = result.stdout.decode()
@@ -38,21 +39,32 @@ def deploy_move_contract(move_code, module_name, deployer_address, private_key):
         os.remove(key_file)
         cleanup_package(package_dir)
 
-def generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri, description, deployer_address):
+def generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri, description, deployer_address, module_name=None):
     """
     Generate a Move contract for a custom Sui token with the given parameters using the static template.
     Returns the path to the contract directory.
     """
     import os
+    import re
     # Read the Move template
     template_path = os.path.join(os.path.dirname(__file__), "../templates/fungible_token_template.move")
     with open(template_path, "r") as f:
         template = f.read()
 
-    # Fill in the template variables
-    # Ensure initial_supply is always a string representing the base unit value
+    # Determine module_name (default: sanitized symbol)
+    if not module_name:
+        # Use token symbol for both module name and witness struct (upper for witness, lower for module)
+        token_name = symbol.lower()
+        token_name_upper = symbol.upper()
+        module_name = token_name
+    else:
+        token_name = module_name.lower()
+        token_name_upper = module_name.upper()
+
     move_code = (
         template
+        .replace("{{token_name}}", token_name)
+        .replace("{{token_name_upper}}", token_name_upper)
         .replace("{{name}}", name)
         .replace("{{symbol}}", symbol)
         .replace("{{description}}", description)
@@ -62,10 +74,10 @@ def generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri
         .replace("{{deployer_address}}", deployer_address)
     )
 
-    module_name = "token_contract"
+    file_name = "token_contract"
     package_root = "/tmp/sui_move_packages"
     os.makedirs(package_root, exist_ok=True)
-    package_dir = create_move_package(package_root, module_name, move_code)
+    package_dir = create_move_package(package_root, file_name, move_code)
     return package_dir
 
 def deploy_token_contract(contract_dir, creator_address):
@@ -74,15 +86,18 @@ def deploy_token_contract(contract_dir, creator_address):
     """
     try:
         # Build the Move package
-        build_cmd = ["sui", "move", "build", "--path", contract_dir]
+        build_cmd = [SUI_CLI_PATH, "move", "build", "--path", contract_dir]
         build_result = subprocess.run(build_cmd, capture_output=True, text=True)
         print(f"[DeployContract] Build stdout:\n{build_result.stdout}")
         print(f"[DeployContract] Build stderr:\n{build_result.stderr}")
         if build_result.returncode != 0:
             return {'success': False, 'error': f"Build failed: {build_result.stderr}"}
-        # Publish the package
+        # Publish the package (NO --key-file, NO --path, just package_dir as positional argument)
         publish_cmd = [
-            "sui", "client", "publish", contract_dir, "--gas-budget", "100000000", "--json"
+            SUI_CLI_PATH, "client", "publish",
+            "--gas-budget", "100000000",
+            "--json",
+            contract_dir
         ]
         publish_result = subprocess.run(publish_cmd, capture_output=True, text=True)
         print(f"[DeployContract] Publish stdout:\n{publish_result.stdout}")

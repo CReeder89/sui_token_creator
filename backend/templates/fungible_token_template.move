@@ -1,4 +1,4 @@
-module token_contract::fungable_token {
+module token_contract::{{token_name}} {
     use std::option;
     use sui::coin;
     use sui::transfer;
@@ -6,11 +6,11 @@ module token_contract::fungable_token {
     use sui::url::{Self, Url};
 
     /// Required witness struct to create a custom coin.
-    public struct FUNGABLE_TOKEN has drop {}
+    public struct {{token_name_upper}} has drop {}
 
     /// Called once on module publish. It creates the coin, sends the TreasuryCap to the deployer,
     /// and mints an initial supply directly to the deployer's address.
-    fun init(witness: FUNGABLE_TOKEN, ctx: &mut TxContext) {
+    fun init(witness: {{token_name_upper}}, ctx: &mut TxContext) {
         let (mut treasury_cap, metadata) = coin::create_currency(
             witness,
             {{decimals}}, // decimals
@@ -38,7 +38,7 @@ module token_contract::fungable_token {
     // {{#if mint}}
     /// Mint new tokens to a recipient (requires TreasuryCap)
     public entry fun mint(
-        treasury_cap: &mut coin::TreasuryCap<FUNGABLE_TOKEN>,
+        treasury_cap: &mut coin::TreasuryCap<{{token_name_upper}}>,
         amount: u64,
         recipient: address,
         ctx: &mut TxContext
@@ -50,8 +50,8 @@ module token_contract::fungable_token {
     // {{#if burn}}
     /// Burn tokens from the caller's balance
     public entry fun burn(
-        treasury_cap: &mut coin::TreasuryCap<FUNGABLE_TOKEN>,
-        coin: coin::Coin<FUNGABLE_TOKEN>
+        treasury_cap: &mut coin::TreasuryCap<{{token_name_upper}}>,
+        coin: coin::Coin<{{token_name_upper}}>
     ): u64 {
         coin::burn(treasury_cap, coin)
     }
@@ -60,7 +60,7 @@ module token_contract::fungable_token {
     // {{#if transfer}}
     /// Transfer tokens to another address
     public entry fun transfer(
-        coin: coin::Coin<FUNGABLE_TOKEN>,
+        coin: coin::Coin<{{token_name_upper}}>,
         recipient: address
     ) {
         transfer::public_transfer(coin, recipient)

@@ -138,5 +138,25 @@
     "metadata_uri": "https://s2.coinmarketcap.com/static/img/coins/200x200/463.png",
     "initial_supply": "10000000000",
     "package_id": "0xd7897e5eb065ad137b4d52dffb2c2b337d6d0c3d02565bbb35fe2343fa03e06b"
+  },
+  {
+    "creator": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee",
+    "name": "Kritika",
+    "symbol": "KRT",
+    "decimals": 9,
+    "description": "Kritika Cat Bearer",
+    "metadata_uri": "https://png.pngtree.com/png-vector/20240930/ourlarge/pngtree-cute-cat-logo-png-image_13983891.png",
+    "initial_supply": "5000000000",
+    "package_id": "0x3f8132bcb18faf4f2e965554f75cffdf4176eac11996144104a5bfa0f296e916"
+  },
+  {
+    "creator": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee",
+    "name": "Harpreet",
+    "symbol": "hpt",
+    "decimals": 9,
+    "description": "Investment Decision",
+    "metadata_uri": "https://avatars.githubusercontent.com/u/95741246?v=4",
+    "initial_supply": "4",
+    "package_id": "0x8f43b3e18a6a7fcbeb0fa0e5a5fc9430b0ed195d86f58f756cd1e15137d191c5"
   }
 ]

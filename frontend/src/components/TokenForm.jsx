@@ -29,8 +29,13 @@ export default function TokenForm({ onSnackbar }) {
   const [deploying, setDeploying] = useState(false);
   const [deployedToken, setDeployedToken] = useState(null);
 
+  // Enforce symbol is uppercase in the form
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    if (e.target.name === "symbol") {
+      setForm({ ...form, symbol: e.target.value.toUpperCase() });
+    } else {
+      setForm({ ...form, [e.target.name]: e.target.value });
+    }
   };
 
   // Defensive field validation before transaction
@@ -82,9 +87,8 @@ export default function TokenForm({ onSnackbar }) {
       const nameBytes = new TextEncoder().encode(form.name);
       const symbolBytes = new TextEncoder().encode(form.symbol);
       const decimalsNum = Number(form.decimals);
-      // Multiply initial supply by 10 ** decimals before sending to contract
-      const initialSupplyBig =
-        BigInt(form.initialSupply) * 10n ** BigInt(decimalsNum);
+      // Do NOT multiply initialSupply by decimals!
+      const initialSupplyBig = BigInt(form.initialSupply); // Use as is
       const metadataBytes = new TextEncoder().encode(form.metadataUri);
       const descriptionBytes = new TextEncoder().encode(form.description);
 

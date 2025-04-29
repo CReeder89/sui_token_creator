@@ -98,16 +98,17 @@ def handle_token_creation_event(event):
     def decode_bytes(val):
         if isinstance(val, list):
             try:
-                return bytes(val).decode("utf-8")
-            except Exception as e:
-                print(f"[EventListener] Error decoding bytes: {val} - {e}")
+                return bytes(val).decode('utf-8')
+            except Exception:
                 return str(val)
         return val
 
+    # Decode fields as needed
     name = decode_bytes(name)
     symbol = decode_bytes(symbol)
-    metadata_uri = decode_bytes(metadata_uri)
     description = decode_bytes(description)
+    metadata_uri = decode_bytes(metadata_uri)
+    
     print(f"[EventListener] Decoded values: name='{name}', symbol='{symbol}', metadata_uri='{metadata_uri}', description='{description}'")
     print(f"[EventListener] decimals={decimals}, initial_supply={initial_supply}, creator={creator}")
 
@@ -119,16 +120,27 @@ def handle_token_creation_event(event):
     try:
         from scripts.deploy_contract import generate_token_contract, deploy_token_contract
         print("[EventListener] Calling generate_token_contract...")
-        contract_dir = generate_token_contract(name, symbol, decimals, initial_supply, metadata_uri, description, creator)
+        contract_dir = generate_token_contract(
+            name=name,
+            symbol=symbol,
+            decimals=decimals,
+            initial_supply=initial_supply,
+            metadata_uri=metadata_uri,
+            description=description,
+            deployer_address=creator,
+            module_name=None # Let function generate from symbol/name
+        )
+        
         print(f"[EventListener] Contract directory generated: {contract_dir}")
+        
         import os
         if os.path.exists(contract_dir):
             print(f"[EventListener][DEBUG] Directory {contract_dir} exists and was created successfully.")
         else:
             print(f"[EventListener][DEBUG] Directory {contract_dir} was NOT created!")
         print("[EventListener] Calling deploy_token_contract...")
+
         deploy_result = deploy_token_contract(contract_dir, creator)
-        print(f"[EventListener] Deploy result: {deploy_result}")
         if deploy_result.get('success'):
             package_id = deploy_result.get('package_id')
             print(f"[EventListener][DEBUG] Contract deployed successfully! Package ID: {package_id}")
@@ -141,8 +153,9 @@ def handle_token_creation_event(event):
                 "description": description,
                 "metadata_uri": metadata_uri,
                 "initial_supply": initial_supply,  # Always string base units
-                "package_id": package_id,
+                "package_id": package_id
             }
+            print(f"[EventListener][DEBUG] Token info: {token_info}")
             add_token_record(token_info)
         else:
             print(f"[EventListener][DEBUG] Contract deployment failed: {deploy_result.get('error')}")

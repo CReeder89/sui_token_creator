@@ -69,16 +69,16 @@ export default function TokenForm({
     setLoading(true);
     setSuccessToken(null); // Reset on new submit
     try {
-      // Calculate actual supply to send to backend
-      const decimals = getDecimals();
-      const actualSupply = Number(displaySupply) * Math.pow(10, decimals);
       // Log the full form payload for the TokenFactory contract
       const tokenFactoryPayload = {
         ...form,
-        decimals: decimals,
-        initial_supply: actualSupply,
+        decimals: getDecimals(),
+        initial_supply: Number(displaySupply), // Send raw value without decimal multiplication
       };
-      console.log('[TokenForm] Payload sent to backend for TokenFactory contract:', tokenFactoryPayload);
+      console.log(
+        "[TokenForm] Payload sent to backend for TokenFactory contract:",
+        tokenFactoryPayload
+      );
       // 1. Generate contract
       const res = await fetch("/generate_contract", {
         method: "POST",
@@ -97,10 +97,10 @@ export default function TokenForm({
         private_key: form.private_key,
         name: form.name,
         symbol: form.symbol,
-        decimals: decimals,
+        decimals: getDecimals(),
         description: form.description,
         icon_url: form.icon_url,
-        initial_supply: actualSupply,
+        initial_supply: Number(displaySupply), // Send raw value without decimal multiplication
         mint: form.mint,
         burn: form.burn,
         transfer: form.transfer,
@@ -115,10 +115,10 @@ export default function TokenForm({
           private_key: form.private_key,
           name: form.name,
           symbol: form.symbol,
-          decimals: decimals,
+          decimals: getDecimals(),
           description: form.description,
           icon_url: form.icon_url,
-          initial_supply: actualSupply,
+          initial_supply: Number(displaySupply), // Send raw value without decimal multiplication
           mint: form.mint,
           burn: form.burn,
           transfer: form.transfer,
@@ -126,11 +126,14 @@ export default function TokenForm({
       });
       const deployData = await deployRes.json();
       alert("Deploy response from backend: " + JSON.stringify(deployData));
-      console.log('[TokenForm] Deploy response from backend:', deployData);
+      console.log("[TokenForm] Deploy response from backend:", deployData);
       if (deployData.status !== "success")
         throw new Error(deployData.detail || "Deployment failed");
       // Use backend deployData directly for green card
-      console.log('[TokenForm] Setting successToken (used for green card):', deployData);
+      console.log(
+        "[TokenForm] Setting successToken (used for green card):",
+        deployData
+      );
       setSuccessToken(deployData);
       onSnackbar("Token deployed successfully!", "success");
       if (onSuccess) onSuccess();
@@ -278,17 +281,57 @@ export default function TokenForm({
         {loading ? "Deploying..." : "Generate & Deploy Token"}
       </Button>
       {successToken && (
-        <Box sx={{ my: 2, p: 2, bgcolor: '#d0f5e8', borderRadius: 2, border: '1px solid #19cf8e' }}>
-          <Typography variant="h6" color="success.main">Token Deployed!</Typography>
-          <Typography><b>Name:</b> {successToken.name}</Typography>
-          <Typography><b>Symbol:</b> {successToken.symbol}</Typography>
-          <Typography><b>Decimals:</b> {successToken.decimals}</Typography>
-          <Typography><b>Description:</b> {successToken.description || 'N/A'}</Typography>
-          <Typography><b>Initial Supply:</b> {successToken.initial_supply ? `${successToken.initial_supply} (raw units), ${(Number(successToken.initial_supply) / Math.pow(10, Number(successToken.decimals || 9))).toLocaleString()} tokens` : 'N/A'}</Typography>
-          <Typography><b>Metadata URI:</b> {successToken.metadata_uri}</Typography>
-          <Typography><b>Package ID:</b> <span style={{ wordBreak: 'break-all' }}>{successToken.package_id || 'N/A'}</span></Typography>
+        <Box
+          sx={{
+            my: 2,
+            p: 2,
+            bgcolor: "#d0f5e8",
+            borderRadius: 2,
+            border: "1px solid #19cf8e",
+          }}
+        >
+          <Typography variant="h6" color="success.main">
+            Token Deployed!
+          </Typography>
+          <Typography>
+            <b>Name:</b> {successToken.name}
+          </Typography>
+          <Typography>
+            <b>Symbol:</b> {successToken.symbol}
+          </Typography>
+          <Typography>
+            <b>Decimals:</b> {successToken.decimals}
+          </Typography>
+          <Typography>
+            <b>Description:</b> {successToken.description || "N/A"}
+          </Typography>
+          <Typography>
+            <b>Initial Supply:</b>{" "}
+            {successToken.initial_supply
+              ? `${successToken.initial_supply} (raw units), ${(
+                  Number(successToken.initial_supply) /
+                  Math.pow(10, Number(successToken.decimals || 9))
+                ).toLocaleString()} tokens`
+              : "N/A"}
+          </Typography>
+          <Typography>
+            <b>Metadata URI:</b> {successToken.metadata_uri}
+          </Typography>
+          <Typography>
+            <b>Package ID:</b>{" "}
+            <span style={{ wordBreak: "break-all" }}>
+              {successToken.package_id || "N/A"}
+            </span>
+          </Typography>
           {successToken.package_id && (
-            <Button size="small" href={`https://suiexplorer.com/object/${successToken.package_id}?network=testnet`} target="_blank" sx={{ mt: 1 }}>View on Explorer</Button>
+            <Button
+              size="small"
+              href={`https://suiexplorer.com/object/${successToken.package_id}?network=testnet`}
+              target="_blank"
+              sx={{ mt: 1 }}
+            >
+              View on Explorer
+            </Button>
           )}
         </Box>
       )}
