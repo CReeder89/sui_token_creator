@@ -158,5 +158,15 @@
     "metadata_uri": "https://avatars.githubusercontent.com/u/95741246?v=4",
     "initial_supply": "4",
     "package_id": "0x8f43b3e18a6a7fcbeb0fa0e5a5fc9430b0ed195d86f58f756cd1e15137d191c5"
+  },
+  {
+    "creator": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee",
+    "name": "Rinku",
+    "symbol": "RNK",
+    "decimals": 9,
+    "description": "Rinku Boy",
+    "metadata_uri": "https://png.pngtree.com/png-vector/20210301/ourmid/pngtree-cute-boy-with-red-hat-mascot-logo-png-image_2968270.jpg",
+    "initial_supply": "10",
+    "package_id": "0x0f9e37372f865995e018c1112fd053671d78586257b6d932fc9491a8175b0bde"
   }
 ]

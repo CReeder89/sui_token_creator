@@ -138,28 +138,29 @@ export default function TokenForm({ onSnackbar }) {
     }
   };
 
+  // Improved polling with setTimeout and longer delay
   function pollForDeployedToken() {
-    const MAX_ATTEMPTS = 20; // e.g., 20 attempts x 3s = 60 seconds
+    const MAX_ATTEMPTS = 20;
     let attempts = 0;
-    const interval = setInterval(async () => {
+
+    async function poll() {
       attempts++;
       try {
-        const res = await fetch(`${BACKEND_URL}/api/user_tokens?address=${account.address}`);
+        const res = await fetch(
+          `${BACKEND_URL}/api/user_tokens?address=${account.address}`
+        );
         if (!res.ok) throw new Error("API error");
         const data = await res.json();
-        console.log("[TokenForm] Polling for deployed token:", data);
         const found = data.tokens.find(
           (t) =>
             t.name === form.name &&
             t.symbol === form.symbol &&
-            (t.packageId || t.package_id) // Only accept if packageId is present
+            (t.packageId || t.package_id)
         );
         if (found) {
           setDeploying(false);
           setDeployedToken(found);
-          console.log("[TokenForm] Deployed token info for green card:", found);
           onSnackbar("Token contract deployed!", "success");
-          clearInterval(interval);
           return;
         }
         if (attempts >= MAX_ATTEMPTS) {
@@ -168,14 +169,17 @@ export default function TokenForm({ onSnackbar }) {
             "Token deployment failed or took too long. Please try again or contact support.",
             "error"
           );
-          clearInterval(interval);
+          return;
         }
+        // Wait 9 seconds before next poll
+        setTimeout(poll, 9000);
       } catch (err) {
         setDeploying(false);
         onSnackbar("Error fetching deployed token info.", "error");
-        clearInterval(interval);
       }
-    }, 3000);
+    }
+
+    poll();
   }
 
   return (
@@ -262,10 +266,12 @@ export default function TokenForm({ onSnackbar }) {
               <b>Decimals:</b> {deployedToken.decimals}
             </Typography>
             <Typography variant="body1">
-              <b>Initial Supply:</b> {deployedToken.initial_supply || deployedToken.initialSupply}
+              <b>Initial Supply:</b>{" "}
+              {deployedToken.initial_supply || deployedToken.initialSupply}
             </Typography>
             <Typography variant="body1">
-              <b>Metadata URI:</b> {deployedToken.metadata_uri || deployedToken.metadataUri}
+              <b>Metadata URI:</b>{" "}
+              {deployedToken.metadata_uri || deployedToken.metadataUri}
             </Typography>
             <Typography variant="body1">
               <b>Description:</b> {deployedToken.description}
@@ -278,7 +284,9 @@ export default function TokenForm({ onSnackbar }) {
             </Typography>
             <Button
               size="small"
-              href={`https://suiexplorer.com/object/${deployedToken.package_id || deployedToken.packageId}?network=testnet`}
+              href={`https://suiexplorer.com/object/${
+                deployedToken.package_id || deployedToken.packageId
+              }?network=testnet`}
               target="_blank"
               sx={{ mt: 1 }}
             >

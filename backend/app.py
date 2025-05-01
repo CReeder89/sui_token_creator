@@ -3,6 +3,7 @@ import shutil
 import uuid
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
 from scripts.deploy_contract import deploy_move_contract
@@ -12,6 +13,14 @@ from database import add_token_record, get_tokens_by_deployer, get_all_tokens
 from scripts.event_listener import start_event_listener
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Add your frontend URL here
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.on_event("startup")
 def on_startup():
