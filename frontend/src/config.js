@@ -4,5 +4,4 @@
 // export const BACKEND_URL = "";
 
 export const BACKEND_URL = "https://sui.chainbros.xyz";
-// export const BACKEND_URL =
-//   "https://10000-golak-suitokencreator-cgew1st4sus.ws-us118.gitpod.io/";
+// export const BACKEND_URL = "https://10000-golak-suitokencreator-cgew1st4sus.ws-us118.gitpod.io/";

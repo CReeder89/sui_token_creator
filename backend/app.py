@@ -11,6 +11,7 @@ from scripts.sui_utils import get_user_tokens, mint_token, burn_token, transfer_
 from scripts.move_package_utils import create_move_package
 from database import add_token_record, get_tokens_by_deployer, get_all_tokens
 from scripts.event_listener import start_event_listener
+from scripts.sui_txn_utils import get_transactions_by_object, get_transactions_by_address, get_transaction_details
 
 app = FastAPI()
 
@@ -216,5 +217,29 @@ def get_all_tokens_api():
     try:
         tokens = get_all_tokens()
         return {"tokens": tokens}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/transactions/by_object/{object_id}")
+def api_transactions_by_object(object_id: str):
+    try:
+        txns = get_transactions_by_object(object_id)
+        return {"transactions": txns}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/transactions/by_address/{address}")
+def api_transactions_by_address(address: str):
+    try:
+        txns = get_transactions_by_address(address)
+        return {"transactions": txns}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/transactions/details/{tx_digest}")
+def api_transaction_details(tx_digest: str):
+    try:
+        details = get_transaction_details(tx_digest)
+        return {"transaction": details}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
