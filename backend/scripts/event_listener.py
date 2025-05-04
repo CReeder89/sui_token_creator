@@ -143,7 +143,8 @@ def handle_token_creation_event(event):
         deploy_result = deploy_token_contract(contract_dir, creator)
         if deploy_result.get('success'):
             package_id = deploy_result.get('package_id')
-            print(f"[EventListener][DEBUG] Contract deployed successfully! Package ID: {package_id}")
+            treasury_cap_id = deploy_result.get('treasury_cap_id')
+            print(f"[EventListener][DEBUG] Contract deployed successfully! Package ID: {package_id}, TreasuryCap ID: {treasury_cap_id}")
             # Store deployed token contract info in tokens_db.json
             token_info = {
                 "creator": creator,
@@ -153,7 +154,8 @@ def handle_token_creation_event(event):
                 "description": description,
                 "metadata_uri": metadata_uri,
                 "initial_supply": initial_supply,  # Always string base units
-                "package_id": package_id
+                "package_id": package_id,
+                "treasury_cap_id": treasury_cap_id
             }
             print(f"[EventListener][DEBUG] Token info: {token_info}")
             add_token_record(token_info)

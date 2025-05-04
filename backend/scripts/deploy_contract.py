@@ -108,11 +108,14 @@ def deploy_token_contract(contract_dir, creator_address):
         import json
         resp = json.loads(output)
         package_id = None
+        treasury_cap_id = None
+        # Find package_id and treasury_cap_id
         for obj in resp.get('objectChanges', []):
             if obj.get('type') == 'published':
                 package_id = obj.get('packageId')
-                break
-        return {'success': True, 'package_id': package_id}
+            if obj.get('type') == 'created' and obj.get('objectType', '').startswith('0x2::coin::TreasuryCap<'):
+                treasury_cap_id = obj.get('objectId')
+        return {'success': True, 'package_id': package_id, 'treasury_cap_id': treasury_cap_id}
     except Exception as e:
         print(f"[DeployContract] Exception: {e}")
         return {'success': False, 'error': str(e)}

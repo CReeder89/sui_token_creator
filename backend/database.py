@@ -35,3 +35,22 @@ def get_all_tokens():
     with _db_lock:
         with open(DB_FILE, 'r') as f:
             return json.load(f)
+
+def delete_token_record(package_id):
+    with _db_lock:
+        with open(DB_FILE, 'r') as f:
+            data = json.load(f)
+        data = [rec for rec in data if rec.get('package_id') != package_id]
+        with open(DB_FILE, 'w') as f:
+            json.dump(data, f, indent=2)
+
+
+def update_token_owner(package_id, new_owner):
+    with _db_lock:
+        with open(DB_FILE, 'r') as f:
+            data = json.load(f)
+        for rec in data:
+            if rec.get('package_id') == package_id:
+                rec['creator'] = new_owner
+        with open(DB_FILE, 'w') as f:
+            json.dump(data, f, indent=2)

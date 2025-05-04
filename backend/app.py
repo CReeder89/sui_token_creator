@@ -1,7 +1,7 @@
 import os
 import shutil
 import uuid
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Body
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -9,7 +9,7 @@ from typing import Optional, List
 from scripts.deploy_contract import deploy_move_contract
 from scripts.sui_utils import get_user_tokens, mint_token, burn_token, transfer_token
 from scripts.move_package_utils import create_move_package
-from database import add_token_record, get_tokens_by_deployer, get_all_tokens
+from database import add_token_record, get_tokens_by_deployer, get_all_tokens, delete_token_record, update_token_owner
 from scripts.event_listener import start_event_listener
 from scripts.sui_txn_utils import get_transactions_by_object, get_transactions_by_address, get_transaction_details
 
@@ -80,6 +80,10 @@ class TransferParams(BaseModel):
     amount: int
     recipient: str
     sender_address: str
+
+class TokenUpdateParams(BaseModel):
+    package_id: str
+    new_owner: str = None  # Optional for transfer
 
 @app.post("/generate_contract")
 def generate_contract(params: ContractParams):
@@ -208,6 +212,7 @@ def my_tokens(req: UserTokensRequest):
 def get_user_tokens(address: str):
     try:
         tokens = get_tokens_by_deployer(address)
+        print("[DEBUG] /api/user_tokens tokens:", tokens)  # Debug print
         return {"tokens": tokens}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -241,5 +246,23 @@ def api_transaction_details(tx_digest: str):
     try:
         details = get_transaction_details(tx_digest)
         return {"transaction": details}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/delete_token")
+def delete_token(params: TokenUpdateParams):
+    try:
+        delete_token_record(params.package_id)
+        return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/update_token_owner")
+def update_token_owner_api(params: TokenUpdateParams):
+    try:
+        if not params.new_owner:
+            raise HTTPException(status_code=400, detail="new_owner is required")
+        update_token_owner(params.package_id, params.new_owner)
+        return {"status": "success"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

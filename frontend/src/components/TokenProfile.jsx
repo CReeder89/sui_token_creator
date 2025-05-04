@@ -77,6 +77,14 @@ export default function TokenProfile({ tokenInfo, onSnackbar }) {
       <Typography variant="subtitle2">
         Package: {tokenInfo.packageId}
       </Typography>
+      <Typography variant="subtitle2">
+        Treasury Cap ID: {(
+          (tokenInfo.treasury_cap_id && tokenInfo.treasury_cap_id !== '0xnan')
+            ? tokenInfo.treasury_cap_id
+            : (tokenInfo.treasuryCapId && tokenInfo.treasuryCapId !== '0xnan')
+              ? tokenInfo.treasuryCapId
+              : 'N/A')}
+      </Typography>
       <Grid container spacing={2} sx={{ mt: 2 }}>
         <Grid item>
           <Button
