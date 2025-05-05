@@ -6,7 +6,6 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
-from scripts.deploy_contract import deploy_move_contract
 from scripts.sui_utils import get_user_tokens, mint_token, burn_token, transfer_token
 from scripts.move_package_utils import create_move_package
 from database import add_token_record, get_tokens_by_deployer, get_tokens_by_owner, get_all_tokens, delete_token_record, update_token_owner
