@@ -79,63 +79,10 @@ export default function TokenForm({
         "[TokenForm] Payload sent to backend for TokenFactory contract:",
         tokenFactoryPayload
       );
-      // 1. Generate contract
-      const res = await fetch("/generate_contract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(tokenFactoryPayload),
-      });
-      const data = await res.json();
-      if (!data.contract_path) throw new Error("Failed to generate contract");
-
-      // 2. Deploy contract
-      alert("About to call /deploy_contract");
-      console.log("About to call /deploy_contract", {
-        move_code: data.contract_path,
-        module_name: data.module_name,
-        deployer_address: deployerAddress,
-        private_key: form.private_key,
-        name: form.name,
-        symbol: form.symbol,
-        decimals: getDecimals(),
-        description: form.description,
-        icon_url: form.icon_url,
-        initial_supply: Number(displaySupply), // Send raw value without decimal multiplication
-        mint: form.mint,
-        burn: form.burn,
-        transfer: form.transfer,
-      });
-      const deployRes = await fetch("/deploy_contract", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          move_code: data.contract_path,
-          module_name: data.module_name,
-          deployer_address: deployerAddress,
-          private_key: form.private_key,
-          name: form.name,
-          symbol: form.symbol,
-          decimals: getDecimals(),
-          description: form.description,
-          icon_url: form.icon_url,
-          initial_supply: Number(displaySupply), // Send raw value without decimal multiplication
-          mint: form.mint,
-          burn: form.burn,
-          transfer: form.transfer,
-        }),
-      });
-      const deployData = await deployRes.json();
-      alert("Deploy response from backend: " + JSON.stringify(deployData));
-      console.log("[TokenForm] Deploy response from backend:", deployData);
-      if (deployData.status !== "success")
-        throw new Error(deployData.detail || "Deployment failed");
-      // Use backend deployData directly for green card
-      console.log(
-        "[TokenForm] Setting successToken (used for green card):",
-        deployData
-      );
-      setSuccessToken(deployData);
-      onSnackbar("Token deployed successfully!", "success");
+      // REMOVE: API calls to /generate_contract and /deploy_contract
+      // The new flow is event-driven; contract deployment is handled by the backend event listener.
+      // You may want to show a message or poll for token status instead.
+      onSnackbar("Token deployment initiated...", "info");
       if (onSuccess) onSuccess();
       return;
     } catch (err) {
