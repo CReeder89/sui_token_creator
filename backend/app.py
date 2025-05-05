@@ -9,7 +9,7 @@ from typing import Optional, List
 from scripts.deploy_contract import deploy_move_contract
 from scripts.sui_utils import get_user_tokens, mint_token, burn_token, transfer_token
 from scripts.move_package_utils import create_move_package
-from database import add_token_record, get_tokens_by_deployer, get_all_tokens, delete_token_record, update_token_owner
+from database import add_token_record, get_tokens_by_deployer, get_tokens_by_owner, get_all_tokens, delete_token_record, update_token_owner
 from scripts.event_listener import start_event_listener
 from scripts.sui_txn_utils import get_transactions_by_object, get_transactions_by_address, get_transaction_details
 
@@ -56,6 +56,9 @@ class DeployParams(BaseModel):
 
 class UserTokensRequest(BaseModel):
     address: str
+
+class OwnerTokensParams(BaseModel):
+    owner_address: str
 
 class MintParams(BaseModel):
     package_id: str
@@ -264,5 +267,13 @@ def update_token_owner_api(params: TokenUpdateParams):
             raise HTTPException(status_code=400, detail="new_owner is required")
         update_token_owner(params.package_id, params.new_owner)
         return {"status": "success"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/my_owned_tokens")
+def my_owned_tokens(params: OwnerTokensParams):
+    try:
+        tokens = get_tokens_by_owner(params.owner_address)
+        return {"tokens": tokens}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

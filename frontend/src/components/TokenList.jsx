@@ -41,22 +41,36 @@ export default function TokenList({ onSnackbar }) {
   useEffect(() => {
     if (!account) return;
     setLoading(true);
-    fetch(`${BACKEND_URL}/api/user_tokens?address=${account.address}`)
-      .then((res) => {
-        if (!res.ok) throw new Error("API error");
-        console.log(res);
-        return res.json();
+    // Fetch tokens where user is creator
+    fetch(`${BACKEND_URL}/my_tokens`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address: account.address })
+    })
+      .then(res => res.json())
+      .then(data => {
+        // Fetch tokens where user is owner (may overlap)
+        fetch(`${BACKEND_URL}/my_owned_tokens`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ owner_address: account.address })
+        })
+          .then(res2 => res2.json())
+          .then(data2 => {
+            // Combine, removing duplicates by package_id
+            const combined = [...(data.tokens || []), ...(data2.tokens || [])];
+            const unique = Object.values(combined.reduce((acc, t) => {
+              acc[t.package_id] = t;
+              return acc;
+            }, {}));
+            setTokens(unique);
+          })
+          .catch(() => {
+            setTokens(data.tokens || []);
+          });
       })
-      .then((data) => {
-        setTokens(data.tokens || []);
-        console.log(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        setLoading(false);
-        onSnackbar &&
-          onSnackbar("Error fetching tokens: " + err.message, "error");
-      });
+      .catch(() => onSnackbar('Failed to load tokens', 'error'))
+      .finally(() => setLoading(false));
   }, [account]);
 
   // Fetch user's Coin<THOKO> objects for the selected token
