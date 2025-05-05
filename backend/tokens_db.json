@@ -226,5 +226,29 @@
     "package_id": "0x4de68a5e62d5b223dbb837c4d4a6d850811610803ec39044f6ce7199f47ca3ba",
     "treasury_cap_id": "0xcf7d46bac5b1f5ec2a0106263447de064ec868d0fab51e2a172ee8e5897f6198",
     "owner": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "Finale",
+    "symbol": "FIN",
+    "decimals": 9,
+    "description": "The Final Test Token",
+    "metadata_uri": "https://cdn.worldvectorlogo.com/logos/finale.svg",
+    "initial_supply": "12",
+    "package_id": "0x8c8fa8109647d508d4d3cdc04fda86877237e9a320e1fbe6716978c2937575fb",
+    "treasury_cap_id": "0x705397c543aa43b3d8fb567d64f14d333b0186ab02e6b5c5b085f803918f5b58",
+    "owner": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393"
+  },
+  {
+    "creator": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393",
+    "name": "UltimateFinale",
+    "symbol": "UFL",
+    "decimals": 9,
+    "description": "The ultimate Finale token",
+    "metadata_uri": "https://png.pngtree.com/png-clipart/20190819/ourmid/pngtree-yellow-and-green-ultimate-text-effect-neon-effect-neon-light-typography.jpg",
+    "initial_supply": "7",
+    "package_id": "0x5fd816a21b5182caa28a44fe4145261fd44fea793511eee2881f58e927864cfe",
+    "treasury_cap_id": "0x944b9fa0650f14a06d5e58c53241ae92eead67a464a87071dc63442db2239540",
+    "owner": "0xb7d3bbea7ce5b2204fbbd67c79f8d32ea4b466552941e2be7553dbca6ecf2393"
   }
 ]

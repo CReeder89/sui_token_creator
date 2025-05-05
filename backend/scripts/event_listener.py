@@ -2,7 +2,7 @@ import time
 import threading
 from typing import Callable
 import requests
-from database import add_token_record
+from database import add_token_record, get_all_tokens
 
 SUI_FULLNODE = "https://fullnode.testnet.sui.io:443"
 PACKAGE_ID = "0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a"  # TODO: Set after deployment
@@ -103,19 +103,22 @@ def handle_token_creation_event(event):
                 return str(val)
         return val
 
-    # Decode fields as needed
     name = decode_bytes(name)
     symbol = decode_bytes(symbol)
     description = decode_bytes(description)
     metadata_uri = decode_bytes(metadata_uri)
-    
-    print(f"[EventListener] Decoded values: name='{name}', symbol='{symbol}', metadata_uri='{metadata_uri}', description='{description}'")
-    print(f"[EventListener] decimals={decimals}, initial_supply={initial_supply}, creator={creator}")
-
-    # --- Ensure initial_supply is always stored as a string representing the base unit value ---
-    # If initial_supply is not already a string, convert it
     if initial_supply is not None:
         initial_supply = str(initial_supply)
+
+    # --- Prevent duplicate deployment/recording ---
+    all_tokens = get_all_tokens()
+    duplicate = any(
+        t.get('creator') == creator and t.get('symbol') == symbol and t.get('name') == name
+        for t in all_tokens
+    )
+    if duplicate:
+        print(f"[EventListener][DEBUG] Duplicate token event detected for creator={creator}, symbol={symbol}, name={name}; skipping deploy and DB record.")
+        return
 
     try:
         from scripts.deploy_contract import generate_token_contract, deploy_token_contract
@@ -128,24 +131,20 @@ def handle_token_creation_event(event):
             metadata_uri=metadata_uri,
             description=description,
             deployer_address=creator,
-            module_name=None # Let function generate from symbol/name
+            module_name=None
         )
-        
         print(f"[EventListener] Contract directory generated: {contract_dir}")
-        
         import os
         if os.path.exists(contract_dir):
             print(f"[EventListener][DEBUG] Directory {contract_dir} exists and was created successfully.")
         else:
             print(f"[EventListener][DEBUG] Directory {contract_dir} was NOT created!")
         print("[EventListener] Calling deploy_token_contract...")
-
         deploy_result = deploy_token_contract(contract_dir, creator)
         if deploy_result.get('success'):
             package_id = deploy_result.get('package_id')
             treasury_cap_id = deploy_result.get('treasury_cap_id')
             print(f"[EventListener][DEBUG] Contract deployed successfully! Package ID: {package_id}, TreasuryCap ID: {treasury_cap_id}")
-            # Store deployed token contract info in tokens_db.json
             token_info = {
                 "creator": creator,
                 "name": name,
@@ -153,7 +152,7 @@ def handle_token_creation_event(event):
                 "decimals": decimals,
                 "description": description,
                 "metadata_uri": metadata_uri,
-                "initial_supply": initial_supply,  # Always string base units
+                "initial_supply": initial_supply,
                 "package_id": package_id,
                 "treasury_cap_id": treasury_cap_id
             }
