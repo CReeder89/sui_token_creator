@@ -59,9 +59,10 @@
 ## 📦 Contract Info
 
 - **Network:** Sui
-- **Package ID:** `0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a`, ``.  
+- **Package ID:** `0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a`, `0x4070440f112702c46a1c84f7dbf4485199e29a56709741c79879983da216b5f6`.
 
 For every token contract a new contract is made that interacts with the other contracts, For example this FOG Token:
+
 - **Package ID:** 0x4070440f112702c46a1c84f7dbf4485199e29a56709741c79879983da216b5f6
 - **Link:** https://suiscan.xyz/testnet/coin/0x4070440f112702c46a1c84f7dbf4485199e29a56709741c79879983da216b5f6::fog::FOG/txs
 
