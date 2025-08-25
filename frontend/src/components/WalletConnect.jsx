@@ -5,11 +5,11 @@ export function WalletConnect() {
   return (
     <div>
       <ConnectButton />
-      {account && (
+      {/* {account && (
         <div style={{ marginTop: 8 }}>
           <span style={{ fontWeight: 600 }}>Connected:</span> {account.address}
         </div>
-      )}
+      )} */}
     </div>
   );
 }

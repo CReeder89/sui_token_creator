@@ -16,7 +16,8 @@ import TokenDetails from "./pages/TokenDetails";
 import TokenForm from "./components/TokenForm.jsx";
 import TokenList from "./components/TokenList.jsx";
 import { WalletConnect } from "./components/WalletConnect.jsx";
-
+import CoinMerge from "./pages/CoinMerge.jsx";
+import ComingSoon from "./pages/ComingSoon.jsx";
 function App() {
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -64,6 +65,8 @@ function App() {
           </Container>
         } />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/coinmerge" element={<CoinMerge />} />
+        <Route path="/comingsoon" element={<ComingSoon />} />
         <Route path="/token/:tokenId" element={<TokenDetails />} />
       </Routes>
       <Footer />

@@ -3,8 +3,9 @@ import { Box, Typography, TextField, Button, Card } from "@mui/material";
 import { Transaction } from "@mysten/sui/transactions";
 import {
   useCurrentAccount,
+  useSignPersonalMessage,
   useSignTransaction,
-  useSuiClient,
+  useSuiClient
 } from "@mysten/dapp-kit";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import { BACKEND_URL } from "../config";
@@ -15,7 +16,10 @@ const FACTORY_MODULE = "factory";
 const FACTORY_FUNCTION = "create_token";
 const FEE_AMOUNT = 1_000_000_000; // 0.001 SUI in MIST
 
+
+
 export default function TokenForm({ onSnackbar }) {
+  const {mutate: signPersonalMessage} = useSignPersonalMessage();
   const account = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
   const suiClient = useSuiClient();
@@ -72,6 +76,17 @@ export default function TokenForm({ onSnackbar }) {
   };
 
   const handleSubmit = async (e) => {
+
+const signedMsg  = await signPersonalMessage({
+        message: new TextEncoder().encode('By signing you are aware of the service charge of 1 SUI'),
+      },
+      {
+        onSuccess: (result) => {
+          console.log("Message signed successfully:", result);
+        }
+      }
+    )
+
     e.preventDefault();
     setDeploying(true);
     if (!account) {
@@ -133,12 +148,13 @@ export default function TokenForm({ onSnackbar }) {
         ],
       });
       // 1. Sign the transaction using the dApp Kit hook
-      const signed = await signTransaction({ transaction: tx });
+      
+      const signed = await signTransaction({ transaction: tx});
       // 2. Execute the transaction using the SuiClient
       const result = await suiClient.executeTransactionBlock({
         transactionBlock: signed.bytes,
         signature: signed.signature,
-        options: { showEffects: true, showEvents: true },
+        options: { showEffects: true, showEvents: true, showBalanceChanges: true},
       });
       onSnackbar("Deploying your token contract...", "info");
       pollForDeployedToken();
