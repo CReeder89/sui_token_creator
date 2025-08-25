@@ -43,3 +43,4 @@ backendnode/.eslintcache
 
 package-lock.json
 move.lock
+/frontend/node_modules
