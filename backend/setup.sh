@@ -9,8 +9,8 @@ pip install -r requirements.txt
 # --- INSTALL SUI CLI FOR LINUX ---
 echo "Installing dependencies for Sui CLI..."
 # Update package list and install necessary tools like curl and git.
-sudo apt-get update
-sudo apt-get install -y curl git build-essential pkg-config libssl-dev cmake
+apt-get update
+apt-get install -y curl git build-essential pkg-config libssl-dev cmake
 
 # Install Rust and Cargo, which are required to build Sui
 # This is a one-line installer from the Rust project.
