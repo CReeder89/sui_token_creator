@@ -43,6 +43,6 @@ backendnode/.eslintcache
 
 package-lock.json
 move.lock
-frontend/node_modules
-frontend/node_modules
-frontend/node_modules/.vite/deps
+/frontend/node_modules
+/frontend/node_modules
+/frontend/node_modules/.vite/deps
