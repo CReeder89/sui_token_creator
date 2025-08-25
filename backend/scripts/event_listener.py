@@ -5,7 +5,7 @@ import requests
 from database import add_token_record, get_all_tokens
 
 SUI_FULLNODE = "https://fullnode.testnet.sui.io:443"
-PACKAGE_ID = "0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a"  # TODO: Set after deployment
+PACKAGE_ID = "0xbeb48ddf424923ef4755d084adef1ad3048ca95b887fa99920eeb570294dad42"  # TODO: Set after deployment
 MODULE_NAME = "factory"
 EVENT_STRUCT = "TokenCreationEvent"
 

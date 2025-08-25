@@ -274,5 +274,29 @@
     "package_id": "0x40a06d7c8159f0ad53c212af6b1cd17a81c0c43412c40941be1a8baec279a435",
     "treasury_cap_id": "0x9bd9f652a39e4215f01309c972b191b7b7322360701da424b4f3295b39d128d3",
     "owner": "0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee"
+  },
+  {
+    "creator": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557",
+    "name": "Fee Token Test",
+    "symbol": "FTT",
+    "decimals": 0,
+    "description": "This is testing platform fees",
+    "metadata_uri": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Red_Color.jpg/1200px-Red_Color.jpg",
+    "initial_supply": "1000",
+    "package_id": "0x320011e03f8c910dea2f44d544f96acc6fad4b05cabf5c788a5ed3791d8c17f8",
+    "treasury_cap_id": "0x5a4a8afa4fcd86d619d5315b796b3e22869e504a1f53dd48fc21a74ef5ee8c1b",
+    "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
+  },
+  {
+    "creator": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557",
+    "name": "Fee2",
+    "symbol": "FEE",
+    "decimals": 0,
+    "description": "This is testing platform fees",
+    "metadata_uri": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Red_Color.jpg/1200px-Red_Color.jpg",
+    "initial_supply": "1000",
+    "package_id": "0x798b464e5d374c4e639aa1718c6d46bdad526a2f9dd16221c2f6b023ac574401",
+    "treasury_cap_id": "0xb6a38a15faffa1e33dc0858e016eff4a4e2b3c694948bde0bd3bada998015ed7",
+    "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
   }
 ]

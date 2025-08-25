@@ -10,9 +10,10 @@ import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import { BACKEND_URL } from "../config";
 
 const FACTORY_PACKAGE_ID =
-  "0xc17a461ed86747587def7cd511e42f63fa147fa73d085ebb936162ab6465529a";
+  "0xbeb48ddf424923ef4755d084adef1ad3048ca95b887fa99920eeb570294dad42";
 const FACTORY_MODULE = "factory";
 const FACTORY_FUNCTION = "create_token";
+const FEE_AMOUNT = 1_000_000_000; // 0.001 SUI in MIST
 
 export default function TokenForm({ onSnackbar }) {
   const account = useCurrentAccount();
@@ -111,9 +112,18 @@ export default function TokenForm({ onSnackbar }) {
       });
 
       const tx = new Transaction();
+
+      
+
+      // Step 2: Split a coin for the fee
+            // This command splits a new coin of the specified amount from one of the gas coins.
+            const [feeCoin] = tx.splitCoins(tx.gas, [FEE_AMOUNT]);
+            console.log(feeCoin)
+
       tx.moveCall({
         target: `${FACTORY_PACKAGE_ID}::${FACTORY_MODULE}::${FACTORY_FUNCTION}`,
         arguments: [
+          feeCoin,
           tx.pure("vector<u8>", nameBytes),
           tx.pure("vector<u8>", symbolBytes),
           tx.pure("u8", decimalsNum),
@@ -133,6 +143,7 @@ export default function TokenForm({ onSnackbar }) {
       onSnackbar("Deploying your token contract...", "info");
       pollForDeployedToken();
     } catch (err) {
+      console.log(err)
       onSnackbar(`Transaction error: ${err.message}`, "error");
       setDeploying(false);
     }
