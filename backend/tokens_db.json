@@ -298,5 +298,17 @@
     "package_id": "0x798b464e5d374c4e639aa1718c6d46bdad526a2f9dd16221c2f6b023ac574401",
     "treasury_cap_id": "0xb6a38a15faffa1e33dc0858e016eff4a4e2b3c694948bde0bd3bada998015ed7",
     "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
+  },
+  {
+    "creator": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557",
+    "name": "Red Coin",
+    "symbol": "RED",
+    "decimals": 0,
+    "description": "This is testing platform fees",
+    "metadata_uri": "https://media.istockphoto.com/id/1399472601/vector/registered-trademark-symbol-line-art-style.jpg?s=612x612&w=0&k=20&c=nP_YwjyHOcLNTqXzypK7z6m9lZpCkhziDDDL4wYFWHY=",
+    "initial_supply": "100",
+    "package_id": "0x75e3fef124dd91abfe8a6c9780361247e6b34ca9b054a67bf6dbb4bd13695dba",
+    "treasury_cap_id": "0xee2c9d009e4db219011d16d70649255695c12ff53765111bed90203f23747647",
+    "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
   }
 ]
