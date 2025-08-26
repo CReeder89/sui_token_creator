@@ -155,7 +155,7 @@ export default function CoinMerge({ onSnackbar }) {
           rel="noopener noreferrer"
         >
           <img
-            src=""
+            src="/Color.png"
             alt="Sui Explorer"
             style={{ height: 50 }}
           />
@@ -239,19 +239,6 @@ export default function CoinMerge({ onSnackbar }) {
           )}
         </CardContent>
       </Card>
-
-      <Box sx={{ mt: 4 }}>
-        <Typography variant="body2" color="text.secondary">
-          You can find the code on{" "}
-          <Link
-            href="https://github.com/cosinguyen/sui-merge-coin"
-            target="_blank"
-            underline="hover"
-          >
-            Github
-          </Link>
-        </Typography>
-      </Box>
     </Box>
   );
 }

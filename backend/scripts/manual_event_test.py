@@ -3,10 +3,10 @@ from scripts.event_listener import handle_token_creation_event
 # Example hardcoded event (update fields as needed for your test)
 hardcoded_event = {
     'id': {'txDigest': 'dummy', 'eventSeq': '0'},
-    'packageId': '0xbeb48ddf424923ef4755d084adef1ad3048ca95b887fa99920eeb570294dad42',
+    'packageId': '0x142bdd629a414e1e30e3672e591f4f88fc2e9a74946fe5e60e93480f3d9df333',
     'transactionModule': 'factory',
     'sender': '0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee',
-    'type': '0xbeb48ddf424923ef4755d084adef1ad3048ca95b887fa99920eeb570294dad42::factory::TokenCreationEvent',
+    'type': '0x142bdd629a414e1e30e3672e591f4f88fc2e9a74946fe5e60e93480f3d9df333::factory::TokenCreationEvent',
     'parsedJson': {
         'creator': '0x66a254f1bcbae153102068f2fb3c9bcc0015f8a91443ba0066f2973ee92924ee',
         'decimals': 9,

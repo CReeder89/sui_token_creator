@@ -9,17 +9,20 @@ import {
 } from "@mysten/dapp-kit";
 import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import { BACKEND_URL } from "../config";
+import { useSuiFee } from "../utils/useSuiFee";
 
 const FACTORY_PACKAGE_ID =
-  "0xbeb48ddf424923ef4755d084adef1ad3048ca95b887fa99920eeb570294dad42";
+  "0x142bdd629a414e1e30e3672e591f4f88fc2e9a74946fe5e60e93480f3d9df333";
 const FACTORY_MODULE = "factory";
 const FACTORY_FUNCTION = "create_token";
-const FEE_AMOUNT = 1_000_000_000; // 0.001 SUI in MIST
+const FEE_STORE_OBJECT_ID = "0xd04213315c6944582a5ec6f26b3817ac603e5810543ba8a2d7b2a7da8823df3e"
+
 
 
 
 export default function TokenForm({ onSnackbar }) {
-  const {mutate: signPersonalMessage} = useSignPersonalMessage();
+  const { fee, isLoading, error } = useSuiFee();
+
   const account = useCurrentAccount();
   const { mutateAsync: signTransaction } = useSignTransaction();
   const suiClient = useSuiClient();
@@ -77,15 +80,6 @@ export default function TokenForm({ onSnackbar }) {
 
   const handleSubmit = async (e) => {
 
-const signedMsg  = await signPersonalMessage({
-        message: new TextEncoder().encode('By signing you are aware of the service charge of 1 SUI'),
-      },
-      {
-        onSuccess: (result) => {
-          console.log("Message signed successfully:", result);
-        }
-      }
-    )
 
     e.preventDefault();
     setDeploying(true);
@@ -128,17 +122,21 @@ const signedMsg  = await signPersonalMessage({
 
       const tx = new Transaction();
 
-      
+      const feeStoreObject = tx.object(FEE_STORE_OBJECT_ID);
 
       // Step 2: Split a coin for the fee
-            // This command splits a new coin of the specified amount from one of the gas coins.
-            const [feeCoin] = tx.splitCoins(tx.gas, [FEE_AMOUNT]);
-            console.log(feeCoin)
+      // This command splits a new coin of the specified amount from one of the gas coins.
+      const [feeCoin] = tx.splitCoins(tx.gas, [1_000_000_000]);
+
+
+
+
 
       tx.moveCall({
         target: `${FACTORY_PACKAGE_ID}::${FACTORY_MODULE}::${FACTORY_FUNCTION}`,
         arguments: [
           feeCoin,
+          feeStoreObject,
           tx.pure("vector<u8>", nameBytes),
           tx.pure("vector<u8>", symbolBytes),
           tx.pure("u8", decimalsNum),
@@ -148,13 +146,13 @@ const signedMsg  = await signPersonalMessage({
         ],
       });
       // 1. Sign the transaction using the dApp Kit hook
-      
-      const signed = await signTransaction({ transaction: tx});
+
+      const signed = await signTransaction({ transaction: tx });
       // 2. Execute the transaction using the SuiClient
       const result = await suiClient.executeTransactionBlock({
         transactionBlock: signed.bytes,
         signature: signed.signature,
-        options: { showEffects: true, showEvents: true, showBalanceChanges: true},
+        options: { showEffects: true, showEvents: true, showBalanceChanges: true },
       });
       onSnackbar("Deploying your token contract...", "info");
       pollForDeployedToken();
@@ -212,6 +210,9 @@ const signedMsg  = await signPersonalMessage({
   return (
     <Box>
       <Typography variant="h5">Create a New Token</Typography>
+      {isLoading && (<Typography>Loading fee info...</Typography>)}
+      {error && (<Typography color="error">Error loading fee: {error}</Typography>)}
+      {fee && (<Typography>Current token creation fee: {fee / 1_000_000_000} SUI</Typography>)}
       <form onSubmit={handleSubmit}>
         <TextField
           label="Name"
@@ -311,9 +312,8 @@ const signedMsg  = await signPersonalMessage({
             </Typography>
             <Button
               size="small"
-              href={`https://suiexplorer.com/object/${
-                deployedToken.package_id || deployedToken.packageId
-              }?network=testnet`}
+              href={`https://suiexplorer.com/object/${deployedToken.package_id || deployedToken.packageId
+                }?network=testnet`}
               target="_blank"
               sx={{ mt: 1 }}
             >

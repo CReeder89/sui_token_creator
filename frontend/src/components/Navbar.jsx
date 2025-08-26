@@ -13,7 +13,7 @@ import {
   Divider,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import TokenIcon from "@mui/icons-material/Token";
+import PaidIcon from '@mui/icons-material/Paid';
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { WalletConnect } from "./WalletConnect";
 
@@ -38,7 +38,7 @@ export default function Navbar() {
         <Toolbar>
           {/* Logo + Title */}
           <IconButton edge="start" color="primary" sx={{ mr: 1 }} onClick={() => navigate("/")}>
-            <TokenIcon fontSize="large" />
+            <PaidIcon fontSize="large" />
           </IconButton>
           <Typography
             variant="h6"
