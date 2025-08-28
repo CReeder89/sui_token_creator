@@ -21,6 +21,7 @@ import { Transaction } from "@mysten/sui/transactions";
 
 export default function CoinMerge({ onSnackbar }) {
   const account = useCurrentAccount();
+  const chain = account?.chains[0].slice(4)
   const suiClient = useSuiClient();
   const { mutateAsync: signTransaction } = useSignTransaction();
 
@@ -139,8 +140,9 @@ export default function CoinMerge({ onSnackbar }) {
   };
 
   useEffect(() => {
-    if (account) getAllBalances();
-  }, [account]);
+    if (account) {
+      getAllBalances()};
+  }, [account, chain]);
 
   return (
     <Box sx={{ p: 3, maxWidth: 800, mx: "auto" }}>

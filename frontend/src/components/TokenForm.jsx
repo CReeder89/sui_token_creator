@@ -197,8 +197,20 @@ export default function TokenForm({ onSnackbar }) {
         signature: signed.signature,
         options: { showEffects: true, showEvents: true, showBalanceChanges: true },
       });
-      onSnackbar("Deploying your token contract...", "info");
-      pollForDeployedToken();
+
+      console.log("Transaction result:", result);
+
+
+      if (result?.effects?.status?.status === "success") {
+        onSnackbar("Transaction successful! Waiting for token deployment...", "success");
+        pollForDeployedToken();
+      } else {
+        setDeploying(false);
+        throw new Error(`Transaction failed: ${JSON.stringify(result?.effects?.status.error)}`);
+      }
+
+      // onSnackbar("Deploying your token contract...", "info");
+      
     } catch (err) {
       console.log(err)
       onSnackbar(`Transaction error: ${err.message}`, "error");

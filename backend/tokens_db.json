@@ -63,5 +63,18 @@
     "package_id": "0xfd2689ba495abc71f4bd25287e3988b5912a363b77fe6c4f7c4aa3619dd3a680",
     "treasury_cap_id": "0xaacfe127a859772bcbfa5bf7ecb61fe08666d015155233bbe1d4af04b3f5d7bf",
     "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
+  },
+  {
+    "creator": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557",
+    "name": "Test Successful ",
+    "symbol": "TS",
+    "decimals": 0,
+    "description": "Testing successful Mint on testnet. ",
+    "metadata_uri": "https://img.freepik.com/free-psd/magnificent-ladybug-detailed-closeup_191095-80564.jpg",
+    "initial_supply": "10",
+    "network": "testnet",
+    "package_id": "0x8c7bcc40f33afb8f0af1e8279404fceb1cec52a7bbe08ce98c9b1d50f2f6c775",
+    "treasury_cap_id": "0xed948264846786134cb09c2afe7955bbf1bd8ff944ca4c2b485b308ade6c531a",
+    "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
   }
 ]
