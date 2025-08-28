@@ -1,31 +1,70 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Box, Typography, TextField, Button, Card } from "@mui/material";
 import { Transaction } from "@mysten/sui/transactions";
 import {
   useCurrentAccount,
-  useSignPersonalMessage,
   useSignTransaction,
   useSuiClient
 } from "@mysten/dapp-kit";
-import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 import { BACKEND_URL } from "../config";
 import { useSuiFee } from "../utils/useSuiFee";
 
-const FACTORY_PACKAGE_ID =
-  "0x142bdd629a414e1e30e3672e591f4f88fc2e9a74946fe5e60e93480f3d9df333";
 const FACTORY_MODULE = "factory";
 const FACTORY_FUNCTION = "create_token";
-const FEE_STORE_OBJECT_ID = "0xd04213315c6944582a5ec6f26b3817ac603e5810543ba8a2d7b2a7da8823df3e"
-
-
 
 
 export default function TokenForm({ onSnackbar }) {
-  const { fee, isLoading, error } = useSuiFee();
+  
+
+  // Initialize state with null or a default value
+  const [feeStoreObjectId, setFeeStoreObjectId] = useState(null);
+  const [factoryPackageId, setFactoryPackageId] = useState(null);
 
   const account = useCurrentAccount();
+  const chain = account?.chains[0].slice(4) // Remove 'sui:' prefix can be 'testnet' or 'mainnet'
+
+  const { fee, isLoading, error } = useSuiFee(feeStoreObjectId); 
+
+  useEffect(() => {
+    // This object maps the chain name to the correct environment variables.
+    // It's a clean way to handle multiple networks and is better than a long if/else or switch.
+    const networkConfigs = {
+      'testnet': {
+        feeStoreId: import.meta.env.VITE_FEE_STORE_OBJECT_ID,
+        factoryId: import.meta.env.VITE_FACTORY_PACKAGE_ID,
+      },
+      'mainnet': {
+        feeStoreId: import.meta.env.VITE_FEE_STORE_OBJECT_ID_MAINNET,
+        factoryId: import.meta.env.VITE_FACTORY_PACKAGE_ID_MAINNET,
+      },
+      'devnet': {
+        feeStoreId: import.meta.env.VITE_DEVNET_FEE_STORE_OBJECT_ID,
+        factoryId: import.meta.env.VITE_DEVNET_FACTORY_PACKAGE_ID,
+      },
+    };
+
+    const selectedConfig = networkConfigs[chain];
+
+    // If a configuration exists for the selected chain, set the state.
+    // Otherwise, set it to null to handle unsupported networks.
+    if (selectedConfig) {
+      setFeeStoreObjectId(selectedConfig.feeStoreId);
+      setFactoryPackageId(selectedConfig.factoryId);
+      console.log(`Switched to ${chain} network. Fee Store: ${selectedConfig.feeStoreId}`);
+    } else {
+      setFeeStoreObjectId(null);
+      setFactoryPackageId(null);
+      console.log(`Unsupported network: ${chain}. IDs set to null.`);
+    }
+
+  }, [chain, account]); // The dependency array ensures this effect runs whenever the 'chain' variable changes.
+
+
+
+
   const { mutateAsync: signTransaction } = useSignTransaction();
   const suiClient = useSuiClient();
+
   const [form, setForm] = useState({
     name: "",
     symbol: "",
@@ -101,6 +140,7 @@ export default function TokenForm({ onSnackbar }) {
       const initialSupplyBig = BigInt(form.initialSupply); // Use as is
       const metadataBytes = new TextEncoder().encode(form.metadataUri);
       const descriptionBytes = new TextEncoder().encode(form.description);
+      const networkBytes = new TextEncoder().encode(chain);
 
       // Log what will be sent to the TokenFactory contract
       console.log("[TokenForm] Calling TokenFactory contract with:", {
@@ -110,6 +150,7 @@ export default function TokenForm({ onSnackbar }) {
         initialSupply: initialSupplyBig.toString(),
         metadataUri: form.metadataUri,
         description: form.description,
+        network: chain,
         encodedArgs: {
           nameBytes,
           symbolBytes,
@@ -117,23 +158,24 @@ export default function TokenForm({ onSnackbar }) {
           initialSupplyBig: initialSupplyBig.toString(),
           metadataBytes,
           descriptionBytes,
+          networkBytes,
         },
       });
 
       const tx = new Transaction();
 
-      const feeStoreObject = tx.object(FEE_STORE_OBJECT_ID);
+      const feeStoreObject = tx.object(feeStoreObjectId);
 
       // Step 2: Split a coin for the fee
       // This command splits a new coin of the specified amount from one of the gas coins.
-      const [feeCoin] = tx.splitCoins(tx.gas, [1_000_000_000]);
+      const [feeCoin] = tx.splitCoins(tx.gas, [fee]);
 
-
+      console.log(fee)
 
 
 
       tx.moveCall({
-        target: `${FACTORY_PACKAGE_ID}::${FACTORY_MODULE}::${FACTORY_FUNCTION}`,
+        target: `${factoryPackageId}::${FACTORY_MODULE}::${FACTORY_FUNCTION}`,
         arguments: [
           feeCoin,
           feeStoreObject,
@@ -143,6 +185,7 @@ export default function TokenForm({ onSnackbar }) {
           tx.pure("u64", initialSupplyBig),
           tx.pure("vector<u8>", metadataBytes),
           tx.pure("vector<u8>", descriptionBytes),
+          tx.pure("vector<u8>", networkBytes),
         ],
       });
       // 1. Sign the transaction using the dApp Kit hook
@@ -210,9 +253,11 @@ export default function TokenForm({ onSnackbar }) {
   return (
     <Box>
       <Typography variant="h5">Create a New Token</Typography>
-      {isLoading && (<Typography>Loading fee info...</Typography>)}
-      {error && (<Typography color="error">Error loading fee: {error}</Typography>)}
-      {fee && (<Typography>Current token creation fee: {fee / 1_000_000_000} SUI</Typography>)}
+      {isLoading ? (<Typography>Loading fee info...</Typography>): null}
+      {error ? (<Typography color="error">Error loading fee: {error}</Typography>): null}
+      {fee ? (<Typography>Current token creation fee: {fee / 1_000_000_000} SUI</Typography>): null}
+
+      
       <form onSubmit={handleSubmit}>
         <TextField
           label="Name"

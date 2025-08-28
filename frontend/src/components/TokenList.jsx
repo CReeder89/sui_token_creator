@@ -49,7 +49,7 @@ export default function TokenList({ onSnackbar }) {
     })
       .then(res => res.json())
       .then(data => {
-        // Fetch tokens where user is owner (may overlap)
+        // Fetch tokens where user is owner (may overlap) 
         fetch(`${BACKEND_URL}/my_owned_tokens`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -63,7 +63,10 @@ export default function TokenList({ onSnackbar }) {
               acc[t.package_id] = t;
               return acc;
             }, {}));
-            setTokens(unique);
+
+            const netFileredCoins = unique.filter(t => t.network === account.chains[0].slice(4)); // Remove 'sui:' prefix
+
+            setTokens(netFileredCoins);
           })
           .catch(() => {
             setTokens(data.tokens || []);

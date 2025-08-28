@@ -66,7 +66,11 @@ export default function Profile({ onSnackbar }) {
                 return acc;
               }, {})
             );
-            setTokens(unique);
+
+
+            const netFileredCoins = unique.filter(t => t.network === account.chains[0].slice(4)); // Remove 'sui:' prefix
+
+            setTokens(netFileredCoins);
           })
           .catch(() => {
             setTokens(data.tokens || []);
@@ -212,8 +216,8 @@ export default function Profile({ onSnackbar }) {
                   image={token.metadata_uri}
                   alt={token.name}
                   onError={(e) =>
-                    (e.currentTarget.src =
-                      "https://via.placeholder.com/300x160?text=No+Image")
+                  (e.currentTarget.src =
+                    "https://via.placeholder.com/300x160?text=No+Image")
                   }
                 />
               )}

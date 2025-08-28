@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   AppBar,
   Toolbar,
@@ -16,14 +16,38 @@ import MenuIcon from "@mui/icons-material/Menu";
 import PaidIcon from '@mui/icons-material/Paid';
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import { WalletConnect } from "./WalletConnect";
+import NetworkSelector from "./NetworkSelect";
+import { useSuiClientContext, useCurrentAccount} from '@mysten/dapp-kit';
 
 export default function Navbar() {
+  const { network } = useSuiClientContext();
   const navigate = useNavigate();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const ctx = useSuiClientContext();
+  const account = useCurrentAccount();
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);
   };
+
+   useEffect(() => {
+    
+    // This code will run every time the `network` variable changes
+    if (network && account) {
+
+      const chain = account?.chains[0].slice(4) // Remove 'sui:' prefix
+
+      ctx.selectNetwork(chain)
+
+      console.log(ctx.network)
+
+
+
+      console.log(`The wallet network has changed to: ${chain}`);
+      // You can call any function here, for example:
+      // myFunctionToRunOnNetworkChange(network);
+    }
+  }, [network, account]); // The dependency array tells useEffect to watch the 'network' variable
 
   const menuItems = [
     { label: "Token Creator", path: "/create" },
@@ -53,6 +77,12 @@ export default function Navbar() {
           >
             Sui Token Creator
           </Typography>
+
+
+            <Typography variant="body1" sx={{ mx: 2 }}>
+              {network ? `Network: ${network}` : 'No Network Selected'}
+            </Typography>
+
 
           {/* Desktop Menu */}
           <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 2 }}>
