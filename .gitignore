@@ -46,3 +46,4 @@ move.lock
 /frontend/node_modules
 /frontend/node_modules
 /frontend/node_modules/.vite/deps
+frontend/.env

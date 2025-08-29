@@ -76,5 +76,18 @@
     "package_id": "0x8c7bcc40f33afb8f0af1e8279404fceb1cec52a7bbe08ce98c9b1d50f2f6c775",
     "treasury_cap_id": "0xed948264846786134cb09c2afe7955bbf1bd8ff944ca4c2b485b308ade6c531a",
     "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
+  },
+  {
+    "creator": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557",
+    "name": "Sparda",
+    "symbol": "DMC",
+    "decimals": 0,
+    "description": "Sparda tokens, 666 minted. ",
+    "metadata_uri": "https://static.vecteezy.com/system/resources/previews/000/622/795/non_2x/vector-s-letter-logo.jpg",
+    "initial_supply": "666",
+    "network": "mainnet",
+    "package_id": "0x1079176d71886a9181ba1c879ea1b300b0157d5f4dcab1486140e04967bba469",
+    "treasury_cap_id": "0x5e75c44be668ff342ce43cc928ce19be959bd2c19fda3596ad2d42c37c9730d4",
+    "owner": "0xd06df023207505825a3c39ef22a3b67c1bb31b8adb7744969352fdf171ec2557"
   }
 ]

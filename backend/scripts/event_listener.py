@@ -12,7 +12,7 @@ NETWORK_CONFIGS = {
     },
     "mainnet": {
         "url": "https://fullnode.mainnet.sui.io:443",
-        "package_id": "0x0",  # TODO: Set after deployment on Mainnet
+        "package_id": "0x87674074df26ae54e80c328631a55b51e0122ada8a89a43a673c0f6be6bf7d51",  # TODO: Set after deployment on Mainnet
     }
 }
 
