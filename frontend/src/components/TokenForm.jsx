@@ -14,7 +14,7 @@ const FACTORY_FUNCTION = "create_token";
 
 
 export default function TokenForm({ onSnackbar }) {
-  
+
 
   // Initialize state with null or a default value
   const [feeStoreObjectId, setFeeStoreObjectId] = useState(null);
@@ -23,7 +23,7 @@ export default function TokenForm({ onSnackbar }) {
   const account = useCurrentAccount();
   const chain = account?.chains[0].slice(4) // Remove 'sui:' prefix can be 'testnet' or 'mainnet'
 
-  const { fee, isLoading, error } = useSuiFee(feeStoreObjectId); 
+  const { fee, isLoading, error } = useSuiFee(feeStoreObjectId);
 
   useEffect(() => {
     // This object maps the chain name to the correct environment variables.
@@ -210,7 +210,7 @@ export default function TokenForm({ onSnackbar }) {
       }
 
       // onSnackbar("Deploying your token contract...", "info");
-      
+
     } catch (err) {
       console.log(err)
       onSnackbar(`Transaction error: ${err.message}`, "error");
@@ -265,11 +265,11 @@ export default function TokenForm({ onSnackbar }) {
   return (
     <Box>
       <Typography variant="h5">Create a New Token</Typography>
-      {isLoading ? (<Typography>Loading fee info...</Typography>): null}
-      {error ? (<Typography color="error">Error loading fee: {error}</Typography>): null}
-      {fee ? (<Typography>Current token creation fee: {fee / 1_000_000_000} SUI</Typography>): null}
+      {isLoading ? (<Typography>Loading fee info...</Typography>) : null}
+      {error ? (<Typography color="error">Error loading fee: {error}</Typography>) : null}
+      {fee ? (<Typography>Current token creation fee: {fee / 1_000_000_000} SUI</Typography>) : null}
 
-      
+
       <form onSubmit={handleSubmit}>
         <TextField
           label="Name"
