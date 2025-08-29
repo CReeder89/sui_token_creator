@@ -53,7 +53,7 @@ export default function Navbar() {
     { label: "Token Creator", path: "/create" },
     { label: "Profile", path: "/profile" },
     { label: "Coin Merge", path: "/coinmerge" },
-    { label: "Coming Soon", path: "/comingsoon" },
+    // { label: "Coming Soon", path: "/comingsoon" },
   ];
 
   return (
